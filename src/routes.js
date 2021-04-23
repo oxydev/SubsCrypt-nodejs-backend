@@ -1,10 +1,10 @@
 'use strict';
 
 const router = require('express').Router();
-const middleware = require('./src/middleware');
-const errors = require('./src/errors');
-const healthRouter = require('./src/health/router');
-const taskRouter = require('./src/tasks/router');
+const middleware = require('./middleware');
+const errors = require('./errors');
+const healthRouter = require('./health/router');
+const taskRouter = require('./tasks/router');
 
 // Wire up middleware
 router.use(middleware.doSomethingInteresting);
