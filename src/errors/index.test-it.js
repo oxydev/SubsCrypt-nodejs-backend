@@ -2,7 +2,7 @@
 
 const chai = require('chai');
 const expect = chai.expect;
-const server = require('../../server');
+const server = require('../server');
 
 describe('Errors - IT', () => {
 
