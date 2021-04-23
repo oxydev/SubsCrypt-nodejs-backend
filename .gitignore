@@ -3,4 +3,5 @@ node_modules
 log
 *.log
 coverage
-.nyc_output
+/.nyc_output/
+/.idea/
