@@ -1,5 +1,7 @@
 'use strict';
 
+import subscrypt from 'subscrypt';
+
 const errors = require('../errors');
 
 
