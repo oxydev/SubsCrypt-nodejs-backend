@@ -2,7 +2,7 @@
   "name": "SubsCrypt-nodejs-backend",
   "main": "src/server.js",
   "version": "0.0.2",
-  "author": "Saber Zafarpoor <szafarpoor@ce.sharif.edu> (https://github.com/saberdotcoder)",
+  "author": "Hadi Esna <atomaton00@gmail.com> (https://github.com/HadiEsna)",
   "license": "MIT",
   "repository": "https://github.com/jaredpetersen/nodejs-api-template.git",
   "scripts": {
