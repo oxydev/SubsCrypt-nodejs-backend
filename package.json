@@ -2,8 +2,8 @@
   "name": "SubsCrypt-nodejs-backend",
   "main": "src/server.js",
   "version": "0.0.2",
-  "author": "Hadi Esna <atomaton00@gmail.com> (https://github.com/HadiEsna)",
-  "license": "MIT",
+   "author": "Hadi Esna <atomaton00@gmail.com> (https://github.com/HadiEsna)",
+   "license": "MIT",
   "repository": "https://github.com/jaredpetersen/nodejs-api-template.git",
   "scripts": {
     "serve": "node src/server.js",
@@ -11,14 +11,11 @@
     "coverage": "nyc npm test"
   },
   "dependencies": {
-    "@polkadot/api": "^4.6.2",
-    "@polkadot/api-contract": "^4.6.2",
-    "@polkadot/extension-dapp": "^0.37.3-14",
     "config": "^3.3.6",
     "express": "4.17.1",
     "morgan": "1.10.0",
     "winston": "^3.3.3",
-    "subscrypt": "file:../SubsCrypt-npm-library"
+    "subscrypt": "0.0.3"
   },
   "devDependencies": {
     "chai": "4.3.4",
