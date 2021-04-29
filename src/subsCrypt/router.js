@@ -6,10 +6,8 @@ const tasks = require('./index');
 
 // Tasks
 router.get('/', tasks.checkAuth);
-router.get('/', tasks.retrieveWholeDataWithPassword);
-router.get('/', tasks.retrieveWholeDataWithWallet);
-router.get('/', tasks.retrieveDataWithPassword);
-router.get('/', tasks.retrieveDataWithWallet);
+router.get('/', tasks.userCheckAuth);
+router.get('/', tasks.providerCheckAuthWithUsername);
 router.get('/', tasks.checkSubscription);
 router.get('/', tasks.checkSubscriptionWithUsername);
 router.get('/', tasks.getUsernameByAddress);
