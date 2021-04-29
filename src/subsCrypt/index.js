@@ -4,62 +4,11 @@ import subscrypt from 'subscrypt';
 
 const errors = require('../errors');
 
-const refactorRes = (response)=>{
-    let status = response.status==='Fetched'?200:400;
+const refactorRes = (response) => {
+    let status = response.status === 'Fetched' ? 200 : 400;
     let result = response.result;
     return [status, result]
 }
-exports.checkAuth = async (req, res, next) => {
-    // check user authorization
-    let username = req['username']
-    let provider_address = req['provider_address']
-    let token = req['token']
-    let pass_phrase = req['phrase']
-    const response = await subscrypt.checkAuth(username, provider_address, token, pass_phrase)
-    let arr = refactorRes(response)
-    res.status(arr[0]).json(arr[1])
-};
-
-exports.retrieveWholeDataWithPassword = async (req, res, next) => {
-    // Retrieve whole data with password
-    // (user: string, token: String, phrase: String) -> Vec<SubscriptionRecord>
-    let username = req['username']
-    let token = req['token']
-    let phrase = req['phrase']
-    const response = await subscrypt.retrieveDataWithPassword(username, token, phrase)
-    let arr = refactorRes(response)
-    res.status(arr[0]).json(arr[1])
-};
-
-exports.retrieveWholeDataWithWallet = async(req, res, next) => {
-    // Retrieve whole data with wallet
-    let username = req['username']
-    const response = await subscrypt.retrieveWholeDataWithWallet(username)
-    let arr = refactorRes(response)
-    res.status(arr[0]).json(arr[1])
-};
-
-exports.retrieveDataWithPassword = async (req, res, next) => {
-    // Retrieve data with password
-    // (user: string, provider_address: string, token: String, phrase: String) -> Vec<SubscriptionRecord>
-    let user = req['user']
-    let provider_address = req['provider_address']
-    let token = req['token']
-    let phrase = req['phrase']
-    const response = await subscrypt.retrieveDataWithPassword(user, provider_address, token, phrase)
-    let arr = refactorRes(response)
-    res.status(arr[0]).json(arr[1])
-};
-
-exports.retrieveDataWithWallet = async (req, res, next) => {
-    // Retrieve data with wallet
-    let username = req['username']
-    let provider_address = req['provider_address']
-    const response = await subscrypt.retrieveDataWithWallet(username, provider_address)
-    let arr = refactorRes(response)
-    res.status(arr[0]).json(arr[1])
-};
-
 exports.checkSubscription = async (req, res, next) => {
     // check subscription
     // (user: string, provider_address: string, plan_index: u128) -> boolean
@@ -138,3 +87,28 @@ exports.checkAuthWithUsername = async (req, res, next) => {
     res.status(arr[0]).json(arr[1])
 };
 
+exports.checkAuth = async (req, res, next) => {
+    // check user authorization
+    let username = req['username']
+    let provider_address = req['provider_address']
+    let pass_phrase = req['phrase']
+    const response = await subscrypt.checkAuth(username, provider_address, pass_phrase)
+    let arr = refactorRes(response)
+    res.status(arr[0]).json(arr[1])
+};
+exports.providerCheckAuth = async (req, res, next) => {
+    // check user authorization
+    let provider_address = req['provider_address']
+    let pass_phrase = req['phrase']
+    const response = await subscrypt.providerCheckAuth(provider_address, pass_phrase)
+    let arr = refactorRes(response)
+    res.status(arr[0]).json(arr[1])
+};
+exports.userCheckAuth = async (req, res, next) => {
+    // check user authorization
+    let username = req['username']
+    let pass_phrase = req['phrase']
+    const response = await subscrypt.checkAuth(username, pass_phrase)
+    let arr = refactorRes(response)
+    res.status(arr[0]).json(arr[1])
+};
