@@ -1,5 +1,3 @@
-'use strict';
-
 const router = require('express').Router();
 const errors = require('./errors');
 const subsCryptRouter = require('./subsCrypt/router');

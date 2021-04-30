@@ -1,10 +1,10 @@
 {
-  "name": "SubsCrypt-nodejs-backend",
+  "name": "subsCrypt-nodejs-backend",
   "main": "src/server.js",
   "version": "0.0.2",
-   "author": "Hadi Esna <atomaton00@gmail.com> (https://github.com/HadiEsna)",
-   "license": "MIT",
-  "repository": "https://github.com/jaredpetersen/nodejs-api-template.git",
+  "author": "Hadi Esna <atomaton00@gmail.com> (https://github.com/HadiEsna)",
+  "license": "Apache-2.0",
+  "repository": "https://github.com/oxydev/SubsCrypt-nodejs-backend/",
   "scripts": {
     "serve": "node src/server.js",
     "test": "NODE_ENV=test mocha src/**/*.test-*.js --exit",
@@ -20,6 +20,9 @@
   "devDependencies": {
     "chai": "4.3.4",
     "chai-http": "4.3.0",
+    "eslint": "^7.25.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1",
     "mocha": "8.3.2",
     "nyc": "15.1.0"
   }
