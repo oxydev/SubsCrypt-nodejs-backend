@@ -1,8 +1,10 @@
 const chai = require('chai');
 
 const { expect } = chai;
+const chaiHttp = require('chai-http');
 const server = require('../server');
 
+chai.use(chaiHttp);
 describe('Errors - IT', () => {
   describe('null route', () => {
     it('returns a 404 response', (done) => {
