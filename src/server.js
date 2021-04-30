@@ -1,5 +1,5 @@
 'use strict';
-
+global.window = {};
 // API boilerplate
 const express = require('express');
 const app = express();

@@ -1,7 +1,6 @@
 'use strict';
 
-import subscrypt from 'subscrypt';
-
+const subscrypt = require('subscrypt');
 const errors = require('../errors');
 
 const refactorRes = (response) => {
