@@ -15,7 +15,7 @@
     "express": "4.17.1",
     "morgan": "1.10.0",
     "winston": "^3.3.3",
-    "subscrypt": "0.0.3"
+    "subscrypt": "^0.0.3"
   },
   "devDependencies": {
     "chai": "4.3.4",
