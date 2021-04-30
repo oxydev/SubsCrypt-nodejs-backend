@@ -1,12 +1,9 @@
-'use strict';
-
 // Handle any errors that come up
 exports.errorHandler = (err, req, res, next) => {
   if (err.status) {
-      res.status(err.status).json({ 'message': err.message });
-  }
-  else {
-      res.status(500).json({ message: 'internal server error' });
+    res.status(err.status).json({ message: err.message });
+  } else {
+    res.status(500).json({ message: 'internal server error' });
   }
 };
 
@@ -24,8 +21,7 @@ exports.newHttpError = (status, message) => {
   // TODO fix this
   if (message == null) {
     err = new Error();
-  }
-  else {
+  } else {
     err = new Error(message);
   }
 

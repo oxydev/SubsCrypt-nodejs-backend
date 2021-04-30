@@ -1,13 +1,10 @@
-'use strict';
-
 const chai = require('chai');
-const expect = chai.expect;
+
+const { expect } = chai;
 const server = require('../server');
 
 describe('Errors - IT', () => {
-
   describe('null route', () => {
-
     it('returns a 404 response', (done) => {
       chai.request(server)
         .get('/nonexistentroute')
@@ -18,7 +15,5 @@ describe('Errors - IT', () => {
           done();
         });
     });
-
   });
-
 });

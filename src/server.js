@@ -1,16 +1,16 @@
-'use strict';
-
+global.window = {};
 // API boilerplate
 const express = require('express');
+
 const app = express();
+const morgan = require('morgan');
+const config = require('config');
 const routes = require('./routes');
 
 // Logging
-const morgan = require('morgan');
 const logger = require('./logger');
 
 // Config
-const config = require('config');
 
 // Set up middleware for request parsing, logging, etc.
 app.use(express.json());
