@@ -2,9 +2,9 @@ const subscrypt = require('subscrypt');
 const errors = require('../errors');
 
 const refactorRes = (response) => {
-  const status = response.status === 'Fetched' ? 200 : 400;
-  const { result } = response;
-  return [status, result];
+    const status = response.status === 'Fetched' ? 200 : 400;
+    const {result} = response;
+    return [status, result];
 };
 exports.checkSubscription = async (req, res, next) => {
   // check subscription
@@ -128,7 +128,7 @@ exports.checkAuth = async (req, res, next) => {
 exports.providerCheckAuth = async (req, res, next) => {
   // check user authorization
   providerAddress = req.query.providerAddress;
-  passPhrase = req.phrase;
+  passPhrase = req.query.phrase;
   await subscrypt.providerCheckAuth(providerAddress, passPhrase).then((resp) => {
     const arr = refactorRes(resp);
     res.status(arr[0]).json(arr[1]);
@@ -139,8 +139,8 @@ exports.providerCheckAuth = async (req, res, next) => {
 exports.userCheckAuth = async (req, res, next) => {
   // check user authorization
   username = req.query.username;
-  passPhrase = req.phrase;
-  await subscrypt.checkAuth(username, passPhrase).then((resp) => {
+  passPhrase = req.query.phrase;
+  await subscrypt.userCheckAuth(username, passPhrase).then((resp) => {
     const arr = refactorRes(resp);
     res.status(arr[0]).json(arr[1]);
   }).catch((err) => {
