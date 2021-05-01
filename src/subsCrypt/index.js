@@ -12,100 +12,138 @@ exports.checkSubscription = async (req, res, next) => {
   user = req.query.user;
   providerAddress = req.query.providerAddress;
   planIndex = req.query.planIndex;
-  const response = await subscrypt.checkSubscription(user, providerAddress, planIndex);
-  const arr = refactorRes(response);
-  res.status(arr[0]).json(arr[1]);
+  await subscrypt.checkSubscription(user, providerAddress, planIndex).then((resp) => {
+    const arr = refactorRes(resp);
+    res.status(arr[0]).json(arr[1]);
+  }).catch((err) => {
+    res.status(500);
+  });
 };
 
 exports.checkSubscriptionWithUsername = async (req, res, next) => {
   username = req.query.username;
   providerAddress = req.query.providerAddress;
   phrase = req.query.phrase;
-  const response = await subscrypt.checkSubscriptionWithUsername(username, providerAddress, phrase);
-  const arr = refactorRes(response);
-  res.status(arr[0]).json(arr[1]);
+  await subscrypt.checkSubscriptionWithUsername(username, providerAddress, phrase).then((resp) => {
+    const arr = refactorRes(resp);
+    res.status(arr[0]).json(arr[1]);
+  }).catch((err) => {
+    res.status(500);
+  });
 };
 exports.getUsernameByAddress = async (req, res, next) => {
-  address = req.query.address;
-  const response = await subscrypt.getUsernameByAddress(address);
-  const arr = refactorRes(response);
-  res.status(arr[0]).json(arr[1]);
+  await subscrypt.getUsernameByAddress().then((resp) => {
+    const arr = refactorRes(resp);
+    res.status(arr[0]).json(arr[1]);
+  }).catch((err) => {
+    res.status(500);
+  });
 };
 exports.retrieveDataWithUsername = async (req, res, next) => {
   username = req.query.username;
   providerAddress = req.query.providerAddress;
   phrase = req.query.phrase;
-  const response = await subscrypt.retrieveDataWithUsername(username, providerAddress, phrase);
-  const arr = refactorRes(response);
-  res.status(arr[0]).json(arr[1]);
+  await subscrypt.retrieveDataWithUsername(username, providerAddress, phrase).then((resp) => {
+    const arr = refactorRes(resp);
+    res.status(arr[0]).json(arr[1]);
+  }).catch((err) => {
+    res.status(500);
+  });
 };
 
 exports.getPlanData = async (req, res, next) => {
   providerAddress = req.query.providerAddress;
   planIndex = req.query.planIndex;
-  const response = await subscrypt.getPlanData(providerAddress, planIndex);
-  const arr = refactorRes(response);
-  res.status(arr[0]).json(arr[1]);
+  await subscrypt.getPlanData(providerAddress, planIndex).then((resp) => {
+    const arr = refactorRes(resp);
+    res.status(arr[0]).json(arr[1]);
+  }).catch((err) => {
+    res.status(500);
+  });
 };
 exports.retrieveWholeDataWithUsername = async (req, res, next) => {
   username = req.query.username;
   phrase = req.query.phrase;
-  const response = await subscrypt.retrieveWholeDataWithUsername(username, phrase);
-  const arr = refactorRes(response);
-  res.status(arr[0]).json(arr[1]);
+  await subscrypt.retrieveWholeDataWithUsername(username, phrase).then((resp) => {
+    const arr = refactorRes(resp);
+    res.status(arr[0]).json(arr[1]);
+  }).catch((err) => {
+    res.status(500);
+  });
 };
 exports.isUsernameAvailable = async (req, res, next) => {
   username = req.query.username;
-  const response = await subscrypt.isUsernameAvailable(username);
-  const arr = refactorRes(response);
-  res.status(arr[0]).json(arr[1]);
+  await subscrypt.isUsernameAvailable(username).then((resp) => {
+    const arr = refactorRes(resp);
+    res.status(arr[0]).json(arr[1]);
+  }).catch((err) => {
+    res.status(500);
+  });
 };
 exports.userCheckAuthWithUsername = async (req, res, next) => {
   username  = req.query.username;
   passPhrase  = req.query.passPhrase;
-  const response = await subscrypt.userCheckAuthWithUsername(username, passPhrase);
-  const arr = refactorRes(response);
-  res.status(arr[0]).json(arr[1]);
+  await subscrypt.userCheckAuthWithUsername(username, passPhrase).then((resp) => {
+    const arr = refactorRes(resp);
+    res.status(arr[0]).json(arr[1]);
+  }).catch((err) => {
+    res.status(500);
+  });
 };
 exports.providerCheckAuthWithUsername = async (req, res, next) => {
   username = req.query.username;
   passPhrase = req.query.phrase;
-  const response = await subscrypt.providerCheckAuthWithUsername(username, passPhrase);
-  const arr = refactorRes(response);
-  res.status(arr[0]).json(arr[1]);
+  await subscrypt.providerCheckAuthWithUsername(username, passPhrase).then((resp) => {
+    const arr = refactorRes(resp);
+    res.status(arr[0]).json(arr[1]);
+  }).catch((err) => {
+    res.status(500);
+  });
 };
 
 exports.checkAuthWithUsername = async (req, res, next) => {
   username = req.query.username;
   providerAddress = req.query.providerAddress;
   passPhrase = req.query.passPhrase;
-  const response = await subscrypt.checkAuthWithUsername(username, providerAddress, passPhrase);
-  const arr = refactorRes(response);
-  res.status(arr[0]).json(arr[1]);
+  await subscrypt.checkAuthWithUsername(username, providerAddress, passPhrase).then((resp) => {
+    const arr = refactorRes(resp);
+    res.status(arr[0]).json(arr[1]);
+  }).catch((err) => {
+    res.status(500);
+  });
 };
 
 exports.checkAuth = async (req, res, next) => {
   // check user authorization
   username = req.query.username;
   providerAddress = req.query.providerAddress;
-  const passPhrase = req.query.phrase;
-  const response = await subscrypt.checkAuth(username, providerAddress, passPhrase);
-  const arr = refactorRes(response);
-  res.status(arr[0]).json(arr[1]);
+  passPhrase = req.query.phrase;
+  await subscrypt.checkAuth(username, providerAddress, passPhrase).then((resp) => {
+    const arr = refactorRes(resp);
+    res.status(arr[0]).json(arr[1]);
+  }).catch((err) => {
+    res.status(500);
+  });
 };
 exports.providerCheckAuth = async (req, res, next) => {
   // check user authorization
   providerAddress = req.query.providerAddress;
   passPhrase = req.phrase;
-  const response = await subscrypt.providerCheckAuth(providerAddress, passPhrase);
-  const arr = refactorRes(response);
-  res.status(arr[0]).json(arr[1]);
+  await subscrypt.providerCheckAuth(providerAddress, passPhrase).then((resp) => {
+    const arr = refactorRes(resp);
+    res.status(arr[0]).json(arr[1]);
+  }).catch((err) => {
+    res.status(500);
+  });
 };
 exports.userCheckAuth = async (req, res, next) => {
   // check user authorization
   username = req.query.username;
   passPhrase = req.phrase;
-  const response = await subscrypt.checkAuth(username, passPhrase);
-  const arr = refactorRes(response);
-  res.status(arr[0]).json(arr[1]);
+  await subscrypt.checkAuth(username, passPhrase).then((resp) => {
+    const arr = refactorRes(resp);
+    res.status(arr[0]).json(arr[1]);
+  }).catch((err) => {
+    res.status(500);
+  });
 };
