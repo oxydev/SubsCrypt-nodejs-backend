@@ -61,8 +61,8 @@ exports.isUsernameAvailable = async (req, res, next) => {
   res.status(arr[0]).json(arr[1]);
 };
 exports.userCheckAuthWithUsername = async (req, res, next) => {
-  const { username } = req.query.;
-  const { passPhrase } = req.query.;
+  username  = req.query.username;
+  passPhrase  = req.query.passPhrase;
   const response = await subscrypt.userCheckAuthWithUsername(username, passPhrase);
   const arr = refactorRes(response);
   res.status(arr[0]).json(arr[1]);
