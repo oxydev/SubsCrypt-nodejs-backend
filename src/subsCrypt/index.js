@@ -2,7 +2,7 @@ const subscrypt = require('subscrypt');
 const errors = require('../errors');
 
 const refactorRes = (response) => {
-    const status = response.status === 'Fetched' ? 200 : 400;
+    const status = response.status === 'Fetched' ? 200 : 'NotConnected' ? 427 : 400;
     const {result} = response;
     return [status, result];
 };
@@ -20,6 +20,11 @@ exports.checkSubscription = async (req, res, next) => {
   });
 };
 
+exports.isConnected = async (req, res, next) => {
+  console.log(await subscrypt.isConnected());
+  res.status(200);
+};
+
 exports.checkSubscriptionWithUsername = async (req, res, next) => {
   username = req.query.username;
   providerAddress = req.query.providerAddress;
@@ -31,6 +36,7 @@ exports.checkSubscriptionWithUsername = async (req, res, next) => {
     res.status(500);
   });
 };
+
 exports.getUsernameByAddress = async (req, res, next) => {
   await subscrypt.getUsernameByAddress().then((resp) => {
     const arr = refactorRes(resp);
@@ -39,6 +45,7 @@ exports.getUsernameByAddress = async (req, res, next) => {
     res.status(500);
   });
 };
+
 exports.retrieveDataWithUsername = async (req, res, next) => {
   username = req.query.username;
   providerAddress = req.query.providerAddress;
@@ -54,13 +61,12 @@ exports.retrieveDataWithUsername = async (req, res, next) => {
 exports.getPlanData = async (req, res, next) => {
   providerAddress = req.query.providerAddress;
   planIndex = req.query.planIndex;
-  await subscrypt.getPlanData(providerAddress, planIndex).then((resp) => {
-    const arr = refactorRes(resp);
-    res.status(arr[0]).json(arr[1]);
-  }).catch((err) => {
-    res.status(500);
-  });
+  resp = await subscrypt.getPlanData(providerAddress, planIndex);
+  console.log(resp);
+  const arr = refactorRes(resp);
+  res.status(arr[0]).json(arr[1]);
 };
+
 exports.retrieveWholeDataWithUsername = async (req, res, next) => {
   username = req.query.username;
   phrase = req.query.phrase;
@@ -71,6 +77,7 @@ exports.retrieveWholeDataWithUsername = async (req, res, next) => {
     res.status(500);
   });
 };
+
 exports.isUsernameAvailable = async (req, res, next) => {
   username = req.query.username;
   await subscrypt.isUsernameAvailable(username).then((resp) => {
@@ -80,6 +87,7 @@ exports.isUsernameAvailable = async (req, res, next) => {
     res.status(500);
   });
 };
+
 exports.userCheckAuthWithUsername = async (req, res, next) => {
   username  = req.query.username;
   passPhrase  = req.query.passPhrase;
@@ -90,6 +98,7 @@ exports.userCheckAuthWithUsername = async (req, res, next) => {
     res.status(500);
   });
 };
+
 exports.providerCheckAuthWithUsername = async (req, res, next) => {
   username = req.query.username;
   passPhrase = req.query.phrase;
@@ -115,16 +124,17 @@ exports.checkAuthWithUsername = async (req, res, next) => {
 
 exports.checkAuth = async (req, res, next) => {
   // check user authorization
-  username = req.query.username;
+  userAddress = req.query.userAddress;
   providerAddress = req.query.providerAddress;
   passPhrase = req.query.phrase;
-  await subscrypt.checkAuth(username, providerAddress, passPhrase).then((resp) => {
+  await subscrypt.checkAuth(userAddress, providerAddress, passPhrase).then((resp) => {
     const arr = refactorRes(resp);
     res.status(arr[0]).json(arr[1]);
   }).catch((err) => {
     res.status(500);
   });
 };
+
 exports.providerCheckAuth = async (req, res, next) => {
   // check user authorization
   providerAddress = req.query.providerAddress;
@@ -136,6 +146,7 @@ exports.providerCheckAuth = async (req, res, next) => {
     res.status(500);
   });
 };
+
 exports.userCheckAuth = async (req, res, next) => {
   // check user authorization
   username = req.query.username;

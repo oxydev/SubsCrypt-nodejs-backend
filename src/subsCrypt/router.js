@@ -16,6 +16,7 @@ router.get('/isUsernameAvailable', tasks.isUsernameAvailable);
 router.get('/userCheckAuthWithUsername', tasks.userCheckAuthWithUsername);
 router.get('/providerCheckAuthWithUsername', tasks.providerCheckAuthWithUsername);
 router.get('/checkAuthWithUsername', tasks.checkAuthWithUsername);
+router.get('/isConnected', tasks.isConnected);
 
 // Export the router
 module.exports = router;
