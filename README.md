@@ -12,7 +12,7 @@ Currently there is no afficial running instance of this server. So if you want t
 
 First you have to ssh to our server which has a running [canvas node](https://github.com/paritytech/canvas-node) on it. However, if you don't have access to the server, please contact me to give you access:)
 ```
-ssh -A root@206.189.154.160 -L localhost:8000:localhost:8000 -L localhost:9615:localhost:9615 -L localhost:9944:localhost:9944
+ssh -A root@{My-SERVER-IP} -L localhost:8000:localhost:8000 -L localhost:9615:localhost:9615 -L localhost:9944:localhost:9944
 ```
 
 and then you should serve the server with this command:
