@@ -37,7 +37,7 @@ const refactorRes = (response) => {
  * @param {number} planIndex - plan_index
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-exports.checkSubscription = async (req, res) => {
+async function checkSubscription(req, res) {
   const { user } = req.query.user;
   const { providerAddress } = req.query.providerAddress;
   const { planIndex } = req.query.planIndex;
@@ -47,15 +47,15 @@ exports.checkSubscription = async (req, res) => {
   }).catch((err) => {
     res.status(500).json(err);
   });
-};
+}
 
 /**
  * check if subscrypt contract is connected or not
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-exports.isConnected = async (req, res) => {
+async function isConnected(req, res) {
   res.status(200).json(await subscrypt.isConnected());
-};
+}
 
 /**
  * Check if the given user has a valid active subscription in the given plan index.
@@ -64,7 +64,7 @@ exports.isConnected = async (req, res) => {
  * @param {number} planIndex - plan_index
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-exports.checkSubscriptionWithUsername = async (req, res) => {
+async function checkSubscriptionWithUsername(req, res) {
   const { username } = req.params.username;
   const { providerAddress } = req.query.providerAddress;
   const { phrase } = req.query.phrase;
@@ -74,14 +74,14 @@ exports.checkSubscriptionWithUsername = async (req, res) => {
   }).catch((err) => {
     res.status(500).json(err);
   });
-};
+}
 
 /**
  * returns username of given address
  * @param {string} sender - Address of user
  * @returns {Promise<string|Failed>} - Result of request
  */
-exports.getUsernameByAddress = async (req, res) => {
+async function getUsernameByAddress(req, res) {
   const { address } = req.params.address;
   await subscrypt.getUsernameByAddress(address).then((resp) => {
     const arr = refactorRes(resp);
@@ -89,7 +89,7 @@ exports.getUsernameByAddress = async (req, res) => {
   }).catch((err) => {
     res.status(500).json(err);
   });
-};
+}
 
 /**
  * Retrieving Subscription Data to given provider With Password
@@ -98,7 +98,7 @@ exports.getUsernameByAddress = async (req, res) => {
  * @param {string} password - password
  * @returns {Promise<SubscriptionFetched|Failed>} - Result of request
  */
-exports.retrieveDataWithUsername = async (req, res) => {
+async function retrieveDataWithUsername(req, res) {
   const { username } = req.query.username;
   const { providerAddress } = req.params.providerAddress;
   const { phrase } = req.query.phrase;
@@ -108,7 +108,7 @@ exports.retrieveDataWithUsername = async (req, res) => {
   }).catch((err) => {
     res.status(500).json(err);
   });
-};
+}
 
 /**
  * Getting Plan Data of a provider
@@ -116,7 +116,7 @@ exports.retrieveDataWithUsername = async (req, res) => {
  * @param {number} planIndex - plan_index
  * @returns {Promise<PlanFetched|Failed>} - Return a plan data or error
  */
-exports.getPlanData = async (req, res) => {
+async function getPlanData(req, res) {
   const { providerAddress } = req.params;
   const { planIndex } = req.params;
   await subscrypt.getPlanData(providerAddress, planIndex).then((resp) => {
@@ -125,7 +125,7 @@ exports.getPlanData = async (req, res) => {
   }).catch((err) => {
     res.status(500).json(err);
   });
-};
+}
 
 /**
  * Retrieving Whole Subscription Data With Password of SubsCrypt dashboard
@@ -133,7 +133,7 @@ exports.getPlanData = async (req, res) => {
  * @param {string} password - password
  * @returns {Promise<SubscriptionFetched|Failed>} - Result of request
  */
-exports.retrieveWholeDataWithUsername = async (req, res) => {
+async function retrieveWholeDataWithUsername(req, res) {
   const { username } = req.query.username;
   const { phrase } = req.query.phrase;
   await subscrypt.retrieveWholeDataWithUsername(username, phrase).then((resp) => {
@@ -142,14 +142,14 @@ exports.retrieveWholeDataWithUsername = async (req, res) => {
   }).catch((err) => {
     res.status(500).json(err);
   });
-};
+}
 
 /**
  * if username is available or not
  * @param {string} username - username
  * @returns {Promise<boolean|Failed>} - Result of request
  */
-exports.isUsernameAvailable = async (req, res) => {
+async function isUsernameAvailable(req, res) {
   const { username } = req.params.username;
   await subscrypt.isUsernameAvailable(username).then((resp) => {
     const arr = refactorRes(resp);
@@ -157,7 +157,7 @@ exports.isUsernameAvailable = async (req, res) => {
   }).catch((err) => {
     res.status(500).json(err);
   });
-};
+}
 
 /**
  * Check password of user for SubsCrypt Dashboard with username
@@ -165,7 +165,7 @@ exports.isUsernameAvailable = async (req, res) => {
  * @param {string} password - password
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-exports.userCheckAuthWithUsername = async (req, res) => {
+async function userCheckAuthWithUsername(req, res) {
   const { username, passPhrase } = req.query;
   await subscrypt.userCheckAuthWithUsername(username, passPhrase).then((resp) => {
     const arr = refactorRes(resp);
@@ -173,7 +173,7 @@ exports.userCheckAuthWithUsername = async (req, res) => {
   }).catch((err) => {
     res.status(500).json(err);
   });
-};
+}
 
 /**
  * Check password of provider for SubsCrypt Dashboard with username
@@ -181,7 +181,7 @@ exports.userCheckAuthWithUsername = async (req, res) => {
  * @param {string} password - password
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-exports.providerCheckAuthWithUsername = async (req, res) => {
+async function providerCheckAuthWithUsername(req, res) {
   const { username } = req.query.username;
   const { passPhrase } = req.query.phrase;
   await subscrypt.providerCheckAuthWithUsername(username, passPhrase).then((resp) => {
@@ -190,7 +190,7 @@ exports.providerCheckAuthWithUsername = async (req, res) => {
   }).catch((err) => {
     res.status(500).json(err);
   });
-};
+}
 
 /**
  * Check password of user for given provider with username
@@ -199,7 +199,7 @@ exports.providerCheckAuthWithUsername = async (req, res) => {
  * @param {string} password - password
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-exports.checkAuthWithUsername = async (req, res) => {
+async function checkAuthWithUsername(req, res) {
   const { username } = req.query.username;
   const { providerAddress } = req.query.providerAddress;
   const { passPhrase } = req.query.passPhrase;
@@ -209,7 +209,7 @@ exports.checkAuthWithUsername = async (req, res) => {
   }).catch((err) => {
     res.status(500).json(err);
   });
-};
+}
 
 /**
  * Check password of user for given provider with wallet
@@ -218,7 +218,7 @@ exports.checkAuthWithUsername = async (req, res) => {
  * @param {string} password - password
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-exports.checkAuth = async (req, res) => {
+async function checkAuth(req, res) {
   const { userAddress } = req.query.userAddress;
   const { providerAddress } = req.query.providerAddress;
   const { passPhrase } = req.query.phrase;
@@ -228,7 +228,7 @@ exports.checkAuth = async (req, res) => {
   }).catch((err) => {
     res.status(500).json(err);
   });
-};
+}
 
 /**
  * Check password of provider for SubsCrypt Dashboard
@@ -236,7 +236,7 @@ exports.checkAuth = async (req, res) => {
  * @param {string} password - password
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-exports.providerCheckAuth = async (req, res) => {
+async function providerCheckAuth(req, res) {
   const { providerAddress } = req.query.providerAddress;
   const { passPhrase } = req.query.phrase;
   await subscrypt.providerCheckAuth(providerAddress, passPhrase).then((resp) => {
@@ -245,7 +245,7 @@ exports.providerCheckAuth = async (req, res) => {
   }).catch((err) => {
     res.status(500).json(err);
   });
-};
+}
 
 /**
  * Check password of user for SubsCrypt Dashboard
@@ -253,7 +253,7 @@ exports.providerCheckAuth = async (req, res) => {
  * @param {string} password - password
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-exports.userCheckAuth = async (req, res) => {
+async function userCheckAuth(req, res) {
   const { username } = req.query.username;
   const { passPhrase } = req.query.phrase;
   await subscrypt.userCheckAuth(username, passPhrase).then((resp) => {
@@ -262,6 +262,21 @@ exports.userCheckAuth = async (req, res) => {
   }).catch((err) => {
     res.status(500).json(err);
   });
-};
+}
 
-module.exports = {};
+module.exports = {
+  userCheckAuth,
+  userCheckAuthWithUsername,
+  providerCheckAuthWithUsername,
+  providerCheckAuth,
+  checkAuth,
+  checkSubscription,
+  checkAuthWithUsername,
+  checkSubscriptionWithUsername,
+  isConnected,
+  isUsernameAvailable,
+  getUsernameByAddress,
+  retrieveDataWithUsername,
+  retrieveWholeDataWithUsername,
+  getPlanData,
+};
