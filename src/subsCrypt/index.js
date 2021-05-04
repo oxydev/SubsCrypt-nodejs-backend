@@ -1,5 +1,4 @@
-const subscrypt = require('subscrypt');
-const errors = require('../errors');
+const subscrypt = require('@oxydev/subscrypt');
 
 /**
  * @typedef PlanConst
@@ -55,13 +54,14 @@ const errors = require('../errors');
  * @property {SubscriptionRecord[]} result Array of SubscriptionRecords
  */
 
-
 const refactorRes = (response) => {
-    const status = response.status === 'Fetched' ? 200 : 'NotConnected' ? 427 : 400;
-    const {result} = response;
-    return [status, result];
-};
+  let status = 400;
+  if (response.status === 'Fetched') status = 200;
+  else if (response.status === 'NotConnected') status = 500;
 
+  const { result } = response;
+  return [status, result];
+};
 
 /**
  * Check if the given user has a valid active subscription in the given plan index.
@@ -70,30 +70,17 @@ const refactorRes = (response) => {
  * @param {number} planIndex - plan_index
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-exports.checkSubscription = async (req, res, next) => {
-  // check subscription
-  // (user: string, provider_address: string, plan_index: u128) -> boolean
-  user = req.query.user;
-  providerAddress = req.query.providerAddress;
-  planIndex = req.query.planIndex;
+exports.checkSubscription = async (req, res) => {
+  const { user } = req.query.user;
+  const { providerAddress } = req.query.providerAddress;
+  const { planIndex } = req.query.planIndex;
   await subscrypt.checkSubscription(user, providerAddress, planIndex).then((resp) => {
     const arr = refactorRes(resp);
     res.status(arr[0]).json(arr[1]);
   }).catch((err) => {
-    res.status(500);
+    res.status(500).json(err);
   });
 };
-
-
-/**
- * check if subscrypt contract is connected or not
- * @returns {Promise<BooleanResult|Failed>} - Result of request
- */
-exports.isConnected = async (req, res, next) => {
-  console.log(await subscrypt.isConnected());
-  res.status(200);
-};
-
 
 /**
  * Check if the given user has a valid active subscription in the given plan index.
@@ -102,15 +89,15 @@ exports.isConnected = async (req, res, next) => {
  * @param {number} planIndex - plan_index
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-exports.checkSubscriptionWithUsername = async (req, res, next) => {
-  username = req.query.username;
-  providerAddress = req.query.providerAddress;
-  phrase = req.query.phrase;
+exports.checkSubscriptionWithUsername = async (req, res) => {
+  const { username } = req.params.username;
+  const { providerAddress } = req.query.providerAddress;
+  const { phrase } = req.query.phrase;
   await subscrypt.checkSubscriptionWithUsername(username, providerAddress, phrase).then((resp) => {
     const arr = refactorRes(resp);
     res.status(arr[0]).json(arr[1]);
   }).catch((err) => {
-    res.status(500);
+    res.status(500).json(err);
   });
 };
 
@@ -119,15 +106,15 @@ exports.checkSubscriptionWithUsername = async (req, res, next) => {
  * @param {string} sender - Address of user
  * @returns {Promise<string|Failed>} - Result of request
  */
-exports.getUsernameByAddress = async (req, res, next) => {
-  await subscrypt.getUsernameByAddress().then((resp) => {
+exports.getUsernameByAddress = async (req, res) => {
+  const { address } = req.params.address;
+  await subscrypt.getUsernameByAddress(address).then((resp) => {
     const arr = refactorRes(resp);
     res.status(arr[0]).json(arr[1]);
   }).catch((err) => {
-    res.status(500);
+    res.status(500).json(err);
   });
 };
-
 
 /**
  * Retrieving Subscription Data to given provider With Password
@@ -136,18 +123,17 @@ exports.getUsernameByAddress = async (req, res, next) => {
  * @param {string} password - password
  * @returns {Promise<SubscriptionFetched|Failed>} - Result of request
  */
-exports.retrieveDataWithUsername = async (req, res, next) => {
-  username = req.query.username;
-  providerAddress = req.query.providerAddress;
-  phrase = req.query.phrase;
+exports.retrieveDataWithUsername = async (req, res) => {
+  const { username } = req.query.username;
+  const { providerAddress } = req.params.providerAddress;
+  const { phrase } = req.query.phrase;
   await subscrypt.retrieveDataWithUsername(username, providerAddress, phrase).then((resp) => {
     const arr = refactorRes(resp);
     res.status(arr[0]).json(arr[1]);
   }).catch((err) => {
-    res.status(500);
+    res.status(500).json(err);
   });
 };
-
 
 /**
  * Getting Plan Data of a provider
@@ -155,16 +141,16 @@ exports.retrieveDataWithUsername = async (req, res, next) => {
  * @param {number} planIndex - plan_index
  * @returns {Promise<PlanFetched|Failed>} - Return a plan data or error
  */
-exports.getPlanData = async (req, res, next) => {
-  providerAddress = req.query.providerAddress;
-  planIndex = req.query.planIndex;
-  resp = await subscrypt.getPlanData(providerAddress, planIndex);
-  console.log(resp);
-  const arr = refactorRes(resp);
-  res.status(arr[0]).json(arr[1]);
+exports.getPlanData = async (req, res) => {
+  const providerAddress  = req.params.providerAddress;
+  const planIndex = req.params.planIndex;
+  await subscrypt.getPlanData(providerAddress, planIndex).then((resp) => {
+    const arr = refactorRes(resp);
+    res.status(arr[0]).json(arr[1]);
+  }).catch((err) => {
+    res.status(500).json(err);
+  });
 };
-
-
 
 /**
  * Retrieving Whole Subscription Data With Password of SubsCrypt dashboard
@@ -172,14 +158,14 @@ exports.getPlanData = async (req, res, next) => {
  * @param {string} password - password
  * @returns {Promise<SubscriptionFetched|Failed>} - Result of request
  */
-exports.retrieveWholeDataWithUsername = async (req, res, next) => {
-  username = req.query.username;
-  phrase = req.query.phrase;
+exports.retrieveWholeDataWithUsername = async (req, res) => {
+  const { username } = req.query.username;
+  const { phrase } = req.query.phrase;
   await subscrypt.retrieveWholeDataWithUsername(username, phrase).then((resp) => {
     const arr = refactorRes(resp);
     res.status(arr[0]).json(arr[1]);
   }).catch((err) => {
-    res.status(500);
+    res.status(500).json(err);
   });
 };
 
@@ -188,16 +174,15 @@ exports.retrieveWholeDataWithUsername = async (req, res, next) => {
  * @param {string} username - username
  * @returns {Promise<boolean|Failed>} - Result of request
  */
-exports.isUsernameAvailable = async (req, res, next) => {
-  username = req.query.username;
+exports.isUsernameAvailable = async (req, res) => {
+  const { username } = req.params.username;
   await subscrypt.isUsernameAvailable(username).then((resp) => {
     const arr = refactorRes(resp);
     res.status(arr[0]).json(arr[1]);
   }).catch((err) => {
-    res.status(500);
+    res.status(500).json(err);
   });
 };
-
 
 /**
  * Check password of user for SubsCrypt Dashboard with username
@@ -205,14 +190,13 @@ exports.isUsernameAvailable = async (req, res, next) => {
  * @param {string} password - password
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-exports.userCheckAuthWithUsername = async (req, res, next) => {
-  username  = req.query.username;
-  passPhrase  = req.query.passPhrase;
+exports.userCheckAuthWithUsername = async (req, res) => {
+  const { username, passPhrase } = req.query;
   await subscrypt.userCheckAuthWithUsername(username, passPhrase).then((resp) => {
     const arr = refactorRes(resp);
     res.status(arr[0]).json(arr[1]);
   }).catch((err) => {
-    res.status(500);
+    res.status(500).json(err);
   });
 };
 
@@ -222,17 +206,16 @@ exports.userCheckAuthWithUsername = async (req, res, next) => {
  * @param {string} password - password
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-exports.providerCheckAuthWithUsername = async (req, res, next) => {
-  username = req.query.username;
-  passPhrase = req.query.phrase;
+exports.providerCheckAuthWithUsername = async (req, res) => {
+  const { username } = req.query.username;
+  const { passPhrase } = req.query.phrase;
   await subscrypt.providerCheckAuthWithUsername(username, passPhrase).then((resp) => {
     const arr = refactorRes(resp);
     res.status(arr[0]).json(arr[1]);
   }).catch((err) => {
-    res.status(500);
+    res.status(500).json(err);
   });
 };
-
 
 /**
  * Check password of user for given provider with username
@@ -241,15 +224,15 @@ exports.providerCheckAuthWithUsername = async (req, res, next) => {
  * @param {string} password - password
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-exports.checkAuthWithUsername = async (req, res, next) => {
-  username = req.query.username;
-  providerAddress = req.query.providerAddress;
-  passPhrase = req.query.passPhrase;
+exports.checkAuthWithUsername = async (req, res) => {
+  const { username } = req.query.username;
+  const { providerAddress } = req.query.providerAddress;
+  const { passPhrase } = req.query.passPhrase;
   await subscrypt.checkAuthWithUsername(username, providerAddress, passPhrase).then((resp) => {
     const arr = refactorRes(resp);
     res.status(arr[0]).json(arr[1]);
   }).catch((err) => {
-    res.status(500);
+    res.status(500).json(err);
   });
 };
 
@@ -261,15 +244,15 @@ exports.checkAuthWithUsername = async (req, res, next) => {
  * @param {string} password - password
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-exports.checkAuth = async (req, res, next) => {
-  userAddress = req.query.userAddress;
-  providerAddress = req.query.providerAddress;
-  passPhrase = req.query.phrase;
+exports.checkAuth = async (req, res) => {
+  const { userAddress } = req.query.userAddress;
+  const { providerAddress } = req.query.providerAddress;
+  const { passPhrase } = req.query.phrase;
   await subscrypt.checkAuth(userAddress, providerAddress, passPhrase).then((resp) => {
     const arr = refactorRes(resp);
     res.status(arr[0]).json(arr[1]);
   }).catch((err) => {
-    res.status(500);
+    res.status(500).json(err);
   });
 };
 
@@ -279,19 +262,16 @@ exports.checkAuth = async (req, res, next) => {
  * @param {string} password - password
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-exports.providerCheckAuth = async (req, res, next) => {
-  // check user authorization
-  providerAddress = req.query.providerAddress;
-  passPhrase = req.query.phrase;
+exports.providerCheckAuth = async (req, res) => {
+  const { providerAddress } = req.query.providerAddress;
+  const { passPhrase } = req.query.phrase;
   await subscrypt.providerCheckAuth(providerAddress, passPhrase).then((resp) => {
     const arr = refactorRes(resp);
     res.status(arr[0]).json(arr[1]);
   }).catch((err) => {
-    res.status(500);
+    res.status(500).json(err);
   });
 };
-
-
 
 /**
  * Check password of user for SubsCrypt Dashboard
@@ -299,13 +279,13 @@ exports.providerCheckAuth = async (req, res, next) => {
  * @param {string} password - password
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-exports.userCheckAuth = async (req, res, next) => {
-  username = req.query.username;
-  passPhrase = req.query.phrase;
+exports.userCheckAuth = async (req, res) => {
+  const { username } = req.query.username;
+  const { passPhrase } = req.query.phrase;
   await subscrypt.userCheckAuth(username, passPhrase).then((resp) => {
     const arr = refactorRes(resp);
     res.status(arr[0]).json(arr[1]);
   }).catch((err) => {
-    res.status(500);
+    res.status(500).json(err);
   });
 };

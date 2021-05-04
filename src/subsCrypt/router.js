@@ -3,20 +3,20 @@ const router = require('express').Router();
 const tasks = require('./index');
 
 // Tasks
-router.get('/checkAuth', tasks.checkAuth);
+
 router.get('/userCheckAuth', tasks.userCheckAuth);
-router.get('/providerCheckAuthWithUsername', tasks.providerCheckAuthWithUsername);
+router.get('/providerCheckAuth', tasks.providerCheckAuth);
 router.get('/checkSubscription', tasks.checkSubscription);
-router.get('/checkSubscriptionWithUsername', tasks.checkSubscriptionWithUsername);
-router.get('/getUsernameByAddress', tasks.getUsernameByAddress);
-router.get('/retrieveDataWithUsername', tasks.retrieveDataWithUsername);
-router.get('/getPlanData', tasks.getPlanData);
-router.get('/retrieveWholeDataWithUsername', tasks.retrieveWholeDataWithUsername);
-router.get('/isUsernameAvailable', tasks.isUsernameAvailable);
-router.get('/userCheckAuthWithUsername', tasks.userCheckAuthWithUsername);
-router.get('/providerCheckAuthWithUsername', tasks.providerCheckAuthWithUsername);
-router.get('/checkAuthWithUsername', tasks.checkAuthWithUsername);
-router.get('/isConnected', tasks.isConnected);
+router.get('/checkSubscription/:username', tasks.checkSubscriptionWithUsername);
+router.get('/getUsernameByAddress/:address', tasks.getUsernameByAddress);
+router.get('/getPlanData/:providerAddress/:planIndex', tasks.getPlanData);
+router.get('/isUsernameAvailable/:username', tasks.isUsernameAvailable);
+router.get('/userCheckAuth/:username', tasks.userCheckAuthWithUsername);
+router.get('/providerCheckAuth/:username', tasks.providerCheckAuthWithUsername);
+router.get('/checkAuth', tasks.checkAuth);
+router.get('/checkAuth/:username', tasks.checkAuthWithUsername);
+router.get('/retrieveDataWithUsername', tasks.retrieveWholeDataWithUsername);
+router.get('/retrieveDataWithUsername/:providerAddress', tasks.retrieveDataWithUsername);
 
 // Export the router
 module.exports = router;
