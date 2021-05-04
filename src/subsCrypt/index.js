@@ -1,6 +1,61 @@
 const subscrypt = require('subscrypt');
 const errors = require('../errors');
 
+/**
+ * @typedef PlanConst
+ * @property {number} duration
+ * @property {number} price
+ * @property {number} max_refund_permille
+ * @property {bool} disabled
+ */
+
+/**
+ * @typedef SubscriptionRecord
+ * @property {string} provider
+ * @property {PlanConst} plan
+ * @property {number} plan_index
+ * @property {number} subscription_time
+ * @property {string[]} characteristics_values_encrypted
+ * @property {bool} refunded
+ */
+
+/**
+ * @typedef Failed
+ * @property {string} status Status of request("Failed") in this case
+ * @property {*} result Debug Data
+ */
+
+/**
+ * @typedef PlanFetched
+ * @property {string} status Status of request("Fetched") in this case
+ * @property {PlanConst} result Plan Const data
+ */
+
+/**
+ * @typedef CharacteristicsFetched
+ * @property {string} status Status of request("Fetched") in this case
+ * @property {string[]} characteristics keys of characteristics mapping of plan
+ */
+
+/**
+ * @typedef HashResult
+ * @property {string} status Status of request("Fetched") in this case
+ * @property {string} result Hash of given string
+ */
+
+/**
+ * @typedef BooleanResult
+ * @property {string} status Status of request("Fetched") in this case
+ * @property {bool} result
+ */
+
+/**
+ * @typedef SubscriptionFetched
+ * @property {string} status Status of request("Fetched") in this case
+ * @property {SubscriptionRecord[]} result Array of SubscriptionRecords
+ */
+
+
 const refactorRes = (response) => {
     const status = response.status === 'Fetched' ? 200 : 'NotConnected' ? 427 : 400;
     const {result} = response;
@@ -9,15 +64,11 @@ const refactorRes = (response) => {
 
 
 /**
- * @function - A CallView function, And It's For Checking Subscription
- * @param args - Arguments Of checkSubscription Function
- * @param {string} user - Address Of User
+ * Check if the given user has a valid active subscription in the given plan index.
+ * @param {string} userAddress - Address Of User
  * @param {string} providerAddress - Address of Provider
  * @param {number} planIndex - plan_index
- {
-  "status": "Fetched",
-  "result": false
-}
+ * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
 exports.checkSubscription = async (req, res, next) => {
   // check subscription
@@ -35,7 +86,8 @@ exports.checkSubscription = async (req, res, next) => {
 
 
 /**
- check if subscrypt contract is connected or not
+ * check if subscrypt contract is connected or not
+ * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
 exports.isConnected = async (req, res, next) => {
   console.log(await subscrypt.isConnected());
@@ -44,16 +96,11 @@ exports.isConnected = async (req, res, next) => {
 
 
 /**
- * @function - A CallView function, And It's For Checking Subscription
- * @param args - Arguments Of checkSubscriptionWithUsername Function
- * @param {string} username - Username
+ * Check if the given user has a valid active subscription in the given plan index.
+ * @param {string} username- Username
  * @param {string} providerAddress - Address of Provider
- * @param {number} phrase - plan_index
- * @returns {Promise<*>} - It's An async Function, And It Waits There To Return The Result Of The Transaction
- {
-  "status": "Fetched",
-  "result": false
-}
+ * @param {number} planIndex - plan_index
+ * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
 exports.checkSubscriptionWithUsername = async (req, res, next) => {
   username = req.query.username;
@@ -67,6 +114,11 @@ exports.checkSubscriptionWithUsername = async (req, res, next) => {
   });
 };
 
+/**
+ * returns username of given address
+ * @param {string} sender - Address of user
+ * @returns {Promise<string|Failed>} - Result of request
+ */
 exports.getUsernameByAddress = async (req, res, next) => {
   await subscrypt.getUsernameByAddress().then((resp) => {
     const arr = refactorRes(resp);
@@ -78,30 +130,11 @@ exports.getUsernameByAddress = async (req, res, next) => {
 
 
 /**
- * @function - A CallView function, And It's For Retrieving Data With Password
- * @param args - Arguments Of retrieveDataWithUsername Function
+ * Retrieving Subscription Data to given provider With Password
  * @param {string} username - Username
  * @param {string} providerAddress - Address of Provider
- * @param {string} phrase - password
- {
-  "status": "Fetched",
-  "result": [
-    {
-      "provider": "5Dyu5YxLufavjPg8vP31BhKs5xz8ncdkQcNdGwf5XtW4C9Ym",
-      "plan": {
-        "duration": "40,000,000",
-        "active_session_limit": "1",
-        "price": "2,000",
-        "max_refund_permille_policy": "200",
-        "disabled": false
-      },
-      "plan_index": "1",
-      "subscription_time": "1,619,631,732,000",
-      "meta_data_encrypted": "shit",
-      "refunded": false
-    }
-  ]
-}
+ * @param {string} password - password
+ * @returns {Promise<SubscriptionFetched|Failed>} - Result of request
  */
 exports.retrieveDataWithUsername = async (req, res, next) => {
   username = req.query.username;
@@ -117,21 +150,10 @@ exports.retrieveDataWithUsername = async (req, res, next) => {
 
 
 /**
- * @function - A CallView function, And It's For Getting Plan Data
- * @param args - Arguments Of getPlanData Function
+ * Getting Plan Data of a provider
  * @param {string} providerAddress - Address of Provider
  * @param {number} planIndex - plan_index
- *
- {
-  "status": "Fetched",
-  "result": {
-  "duration": "20,000,000",
-    "active_session_limit": "1",
-    "price": "1,000",
-    "max_refund_permille_policy": "100",
-    "disabled": false
-  }
-}
+ * @returns {Promise<PlanFetched|Failed>} - Return a plan data or error
  */
 exports.getPlanData = async (req, res, next) => {
   providerAddress = req.query.providerAddress;
@@ -145,29 +167,10 @@ exports.getPlanData = async (req, res, next) => {
 
 
 /**
- * @function - A CallView function, And It's For Retrieving Whole Data With Password
- * @param args - Arguments Of retrieveWholeDataWithUsername Function
+ * Retrieving Whole Subscription Data With Password of SubsCrypt dashboard
  * @param {string} username - Username
- * @param {string} phrase - password
- {
-  "status": "Fetched",
-  "result": [
-    {
-      "provider": "5Dyu5YxLufavjPg8vP31BhKs5xz8ncdkQcNdGwf5XtW4C9Ym",
-      "plan": {
-        "duration": "40,000,000",
-        "active_session_limit": "1",
-        "price": "2,000",
-        "max_refund_permille_policy": "200",
-        "disabled": false
-      },
-      "plan_index": "1",
-      "subscription_time": "1,619,631,732,000",
-      "meta_data_encrypted": "shit",
-      "refunded": false
-    }
-  ]
-}
+ * @param {string} password - password
+ * @returns {Promise<SubscriptionFetched|Failed>} - Result of request
  */
 exports.retrieveWholeDataWithUsername = async (req, res, next) => {
   username = req.query.username;
@@ -180,7 +183,11 @@ exports.retrieveWholeDataWithUsername = async (req, res, next) => {
   });
 };
 
-
+/**
+ * if username is available or not
+ * @param {string} username - username
+ * @returns {Promise<boolean|Failed>} - Result of request
+ */
 exports.isUsernameAvailable = async (req, res, next) => {
   username = req.query.username;
   await subscrypt.isUsernameAvailable(username).then((resp) => {
@@ -193,14 +200,10 @@ exports.isUsernameAvailable = async (req, res, next) => {
 
 
 /**
- * @function - A CallView function, And It's For Checking Auth in SubsCrypt Dashboard
- * @param args - Arguments Of userCheckAuthWithUsername Function
+ * Check password of user for SubsCrypt Dashboard with username
  * @param {string} username - Username
- * @param {string} passPhrase - pass_phrase
- {
-  "status": "Fetched",
-  "result": true
-}
+ * @param {string} password - password
+ * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
 exports.userCheckAuthWithUsername = async (req, res, next) => {
   username  = req.query.username;
@@ -213,17 +216,11 @@ exports.userCheckAuthWithUsername = async (req, res, next) => {
   });
 };
 
-
-
 /**
- * @function - A CallView function, And It's For Checking Auth in SubsCrypt Dashboard
- * @param args - Arguments Of providerCheckAuthWithUsername Function
- * @param {string} username - Username of provider
- * @param {string} phrase - pass_phrase
- {
-  "status": "Fetched",
-  "result": true
-}
+ * Check password of provider for SubsCrypt Dashboard with username
+ * @param {string} providerUsername - Username of provider
+ * @param {string} password - password
+ * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
 exports.providerCheckAuthWithUsername = async (req, res, next) => {
   username = req.query.username;
@@ -238,15 +235,11 @@ exports.providerCheckAuthWithUsername = async (req, res, next) => {
 
 
 /**
- * @function - A CallView function, And It's For Checking Auth of users in different providers using user and pass
- * @param args - Arguments Of checkAuthWithUsername Function
- * @param {string} username - username of user
- * @param {string} providerAddress - Address of Provider
- * @param {string} passPhrase - pass_phrase
- {
-  "status": "Fetched",
-  "result": true
-}
+ * Check password of user for given provider with username
+ * @param {string} username - Username
+ * @param {string} providerAddress - Address of provider
+ * @param {string} password - password
+ * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
 exports.checkAuthWithUsername = async (req, res, next) => {
   username = req.query.username;
@@ -262,18 +255,13 @@ exports.checkAuthWithUsername = async (req, res, next) => {
 
 
 /**
- * @function - A CallView function, And It's For Checking Auth of users in different providers using wallet
- * @param args - Arguments Of checkAuth Function
- * @param {string} userAddress - Address Of User
- * @param {string} providerAddress - Address of Provider
- * @param {string} phrase - pass_phrase
- {
-  "status": "Fetched",
-  "result": true
-}
+ * Check password of user for given provider with wallet
+ * @param {string} userAddress - Address of User
+ * @param {string} providerAddress - Address of provider
+ * @param {string} password - password
+ * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
 exports.checkAuth = async (req, res, next) => {
-  // check user authorization
   userAddress = req.query.userAddress;
   providerAddress = req.query.providerAddress;
   passPhrase = req.query.phrase;
@@ -286,14 +274,10 @@ exports.checkAuth = async (req, res, next) => {
 };
 
 /**
- * @function - A CallView function, And It's For Checking Auth in SubsCrypt Dashboard
- * @param args - Arguments Of providerCheckAuth Function
+ * Check password of provider for SubsCrypt Dashboard
  * @param {string} providerAddress - Address Of Provider
- * @param {string} phrase - pass_phrase
- {
-  "status": "Fetched",
-  "result": true
-}
+ * @param {string} password - password
+ * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
 exports.providerCheckAuth = async (req, res, next) => {
   // check user authorization
@@ -308,18 +292,14 @@ exports.providerCheckAuth = async (req, res, next) => {
 };
 
 
+
 /**
- * @function - A CallView function, And It's For Checking Auth in SubsCrypt Dashboard
- * @param args - Arguments Of userCheckAuth Function
- * @param {string} username - Address Of User
- * @param {string} phrase - pass_phrase
- {
-  "status": "Fetched",
-  "result": true
-}
+ * Check password of user for SubsCrypt Dashboard
+ * @param {string} userAddress - Address Of User
+ * @param {string} password - password
+ * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
 exports.userCheckAuth = async (req, res, next) => {
-  // check user authorization
   username = req.query.username;
   passPhrase = req.query.phrase;
   await subscrypt.userCheckAuth(username, passPhrase).then((resp) => {
