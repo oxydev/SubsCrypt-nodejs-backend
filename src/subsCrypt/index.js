@@ -1,5 +1,5 @@
 const subscrypt = require('@oxydev/subscrypt');
-
+const errors = require('../errors');
 /**
  * @typedef PlanFetched
  * @property {string} status Status of request("Fetched") in this case
@@ -27,7 +27,7 @@ const subscrypt = require('@oxydev/subscrypt');
 const refactorRes = (response) => {
   const status = response.status === 'Fetched' ? 200 : 500;
   const { result } = response;
-  return [status, result];
+  return [status, status === 200 ? result : response.status];
 };
 
 /**
@@ -37,16 +37,18 @@ const refactorRes = (response) => {
  * @param {number} planIndex - plan_index
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-async function checkSubscription(req, res) {
-  const { user } = req.query.user;
-  const { providerAddress } = req.query.providerAddress;
-  const { planIndex } = req.query.planIndex;
-  await subscrypt.checkSubscription(user, providerAddress, planIndex).then((resp) => {
-    const arr = refactorRes(resp);
-    res.status(arr[0]).json(arr[1]);
-  }).catch((err) => {
-    res.status(500).json(err);
-  });
+async function checkSubscription(req, res, next) {
+  try {
+    console.log(req.query.user, req.query.providerAddress, req.query.planIndex);
+    await subscrypt.checkSubscription(req.query.user, req.query.providerAddress, req.query.planIndex).then((resp) => {
+      const arr = refactorRes(resp);
+      res.status(arr[0]).json(arr[1]);
+    }).catch((err) => {
+      res.status(500).json(err);
+    });
+  } catch {
+    next(errors.newHttpError(404, 'Wrong Args'));
+  }
 }
 
 /**
@@ -64,16 +66,20 @@ async function isConnected(req, res) {
  * @param {number} planIndex - plan_index
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-async function checkSubscriptionWithUsername(req, res) {
-  const { username } = req.params.username;
-  const { providerAddress } = req.query.providerAddress;
-  const { phrase } = req.query.phrase;
-  await subscrypt.checkSubscriptionWithUsername(username, providerAddress, phrase).then((resp) => {
-    const arr = refactorRes(resp);
-    res.status(arr[0]).json(arr[1]);
-  }).catch((err) => {
-    res.status(500).json(err);
-  });
+async function checkSubscriptionWithUsername(req, res, next) {
+  try {
+    const { username } = req.params.username;
+    const { providerAddress } = req.query.providerAddress;
+    const { phrase } = req.query.phrase;
+    await subscrypt.checkSubscriptionWithUsername(username, providerAddress, phrase).then((resp) => {
+      const arr = refactorRes(resp);
+      res.status(arr[0]).json(arr[1]);
+    }).catch((err) => {
+      res.status(500).json(err);
+    });
+  } catch {
+    next(errors.newHttpError(404, 'Wrong Args'));
+  }
 }
 
 /**
@@ -81,14 +87,18 @@ async function checkSubscriptionWithUsername(req, res) {
  * @param {string} sender - Address of user
  * @returns {Promise<string|Failed>} - Result of request
  */
-async function getUsernameByAddress(req, res) {
-  const { address } = req.params.address;
-  await subscrypt.getUsernameByAddress(address).then((resp) => {
-    const arr = refactorRes(resp);
-    res.status(arr[0]).json(arr[1]);
-  }).catch((err) => {
-    res.status(500).json(err);
-  });
+async function getUsernameByAddress(req, res, next) {
+  try {
+    const { address } = req.params.address;
+    await subscrypt.getUsernameByAddress(address).then((resp) => {
+      const arr = refactorRes(resp);
+      res.status(arr[0]).json(arr[1]);
+    }).catch((err) => {
+      res.status(500).json(err);
+    });
+  } catch {
+    next(errors.newHttpError(404, 'Wrong Args'));
+  }
 }
 
 /**
@@ -98,16 +108,20 @@ async function getUsernameByAddress(req, res) {
  * @param {string} password - password
  * @returns {Promise<SubscriptionFetched|Failed>} - Result of request
  */
-async function retrieveDataWithUsername(req, res) {
-  const { username } = req.query.username;
-  const { providerAddress } = req.params.providerAddress;
-  const { phrase } = req.query.phrase;
-  await subscrypt.retrieveDataWithUsername(username, providerAddress, phrase).then((resp) => {
-    const arr = refactorRes(resp);
-    res.status(arr[0]).json(arr[1]);
-  }).catch((err) => {
-    res.status(500).json(err);
-  });
+async function retrieveDataWithUsername(req, res, next) {
+  try {
+    const { username } = req.query.username;
+    const { providerAddress } = req.params.providerAddress;
+    const { phrase } = req.query.phrase;
+    await subscrypt.retrieveDataWithUsername(username, providerAddress, phrase).then((resp) => {
+      const arr = refactorRes(resp);
+      res.status(arr[0]).json(arr[1]);
+    }).catch((err) => {
+      res.status(500).json(err);
+    });
+  } catch {
+    next(errors.newHttpError(404, 'Wrong Args'));
+  }
 }
 
 /**
@@ -116,15 +130,19 @@ async function retrieveDataWithUsername(req, res) {
  * @param {number} planIndex - plan_index
  * @returns {Promise<PlanFetched|Failed>} - Return a plan data or error
  */
-async function getPlanData(req, res) {
-  const { providerAddress } = req.params;
-  const { planIndex } = req.params;
-  await subscrypt.getPlanData(providerAddress, planIndex).then((resp) => {
-    const arr = refactorRes(resp);
-    res.status(arr[0]).json(arr[1]);
-  }).catch((err) => {
-    res.status(500).json(err);
-  });
+async function getPlanData(req, res, next) {
+  try {
+    const { providerAddress } = req.params;
+    const { planIndex } = req.params;
+    await subscrypt.getPlanData(providerAddress, planIndex).then((resp) => {
+      const arr = refactorRes(resp);
+      res.status(arr[0]).json(arr[1]);
+    }).catch((err) => {
+      res.status(500).json(err);
+    });
+  } catch {
+    next(errors.newHttpError(404, 'Wrong Args'));
+  }
 }
 
 /**
@@ -133,15 +151,19 @@ async function getPlanData(req, res) {
  * @param {string} password - password
  * @returns {Promise<SubscriptionFetched|Failed>} - Result of request
  */
-async function retrieveWholeDataWithUsername(req, res) {
-  const { username } = req.query.username;
-  const { phrase } = req.query.phrase;
-  await subscrypt.retrieveWholeDataWithUsername(username, phrase).then((resp) => {
-    const arr = refactorRes(resp);
-    res.status(arr[0]).json(arr[1]);
-  }).catch((err) => {
-    res.status(500).json(err);
-  });
+async function retrieveWholeDataWithUsername(req, res, next) {
+  try {
+    const { username } = req.query.username;
+    const { phrase } = req.query.phrase;
+    await subscrypt.retrieveWholeDataWithUsername(username, phrase).then((resp) => {
+      const arr = refactorRes(resp);
+      res.status(arr[0]).json(arr[1]);
+    }).catch((err) => {
+      res.status(500).json(err);
+    });
+  } catch {
+    next(errors.newHttpError(404, 'Wrong Args'));
+  }
 }
 
 /**
@@ -149,14 +171,18 @@ async function retrieveWholeDataWithUsername(req, res) {
  * @param {string} username - username
  * @returns {Promise<boolean|Failed>} - Result of request
  */
-async function isUsernameAvailable(req, res) {
-  const { username } = req.params.username;
-  await subscrypt.isUsernameAvailable(username).then((resp) => {
-    const arr = refactorRes(resp);
-    res.status(arr[0]).json(arr[1]);
-  }).catch((err) => {
-    res.status(500).json(err);
-  });
+async function isUsernameAvailable(req, res, next) {
+  try {
+    const { username } = req.params.username;
+    await subscrypt.isUsernameAvailable(username).then((resp) => {
+      const arr = refactorRes(resp);
+      res.status(arr[0]).json(arr[1]);
+    }).catch((err) => {
+      res.status(500).json(err);
+    });
+  } catch {
+    next(errors.newHttpError(404, 'Wrong Args'));
+  }
 }
 
 /**
@@ -165,14 +191,18 @@ async function isUsernameAvailable(req, res) {
  * @param {string} password - password
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-async function userCheckAuthWithUsername(req, res) {
-  const { username, passPhrase } = req.query;
-  await subscrypt.userCheckAuthWithUsername(username, passPhrase).then((resp) => {
-    const arr = refactorRes(resp);
-    res.status(arr[0]).json(arr[1]);
-  }).catch((err) => {
-    res.status(500).json(err);
-  });
+async function userCheckAuthWithUsername(req, res, next) {
+  try {
+    const { username, passPhrase } = req.query;
+    await subscrypt.userCheckAuthWithUsername(username, passPhrase).then((resp) => {
+      const arr = refactorRes(resp);
+      res.status(arr[0]).json(arr[1]);
+    }).catch((err) => {
+      res.status(500).json(err);
+    });
+  } catch {
+    next(errors.newHttpError(404, 'Wrong Args'));
+  }
 }
 
 /**
@@ -181,15 +211,19 @@ async function userCheckAuthWithUsername(req, res) {
  * @param {string} password - password
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-async function providerCheckAuthWithUsername(req, res) {
-  const { username } = req.query.username;
-  const { passPhrase } = req.query.phrase;
-  await subscrypt.providerCheckAuthWithUsername(username, passPhrase).then((resp) => {
-    const arr = refactorRes(resp);
-    res.status(arr[0]).json(arr[1]);
-  }).catch((err) => {
-    res.status(500).json(err);
-  });
+async function providerCheckAuthWithUsername(req, res, next) {
+  try {
+    const { username } = req.query.username;
+    const { passPhrase } = req.query.phrase;
+    await subscrypt.providerCheckAuthWithUsername(username, passPhrase).then((resp) => {
+      const arr = refactorRes(resp);
+      res.status(arr[0]).json(arr[1]);
+    }).catch((err) => {
+      res.status(500).json(err);
+    });
+  } catch {
+    next(errors.newHttpError(404, 'Wrong Args'));
+  }
 }
 
 /**
@@ -199,16 +233,20 @@ async function providerCheckAuthWithUsername(req, res) {
  * @param {string} password - password
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-async function checkAuthWithUsername(req, res) {
-  const { username } = req.query.username;
-  const { providerAddress } = req.query.providerAddress;
-  const { passPhrase } = req.query.passPhrase;
-  await subscrypt.checkAuthWithUsername(username, providerAddress, passPhrase).then((resp) => {
-    const arr = refactorRes(resp);
-    res.status(arr[0]).json(arr[1]);
-  }).catch((err) => {
-    res.status(500).json(err);
-  });
+async function checkAuthWithUsername(req, res, next) {
+  try {
+    const { username } = req.query.username;
+    const { providerAddress } = req.query.providerAddress;
+    const { passPhrase } = req.query.passPhrase;
+    await subscrypt.checkAuthWithUsername(username, providerAddress, passPhrase).then((resp) => {
+      const arr = refactorRes(resp);
+      res.status(arr[0]).json(arr[1]);
+    }).catch((err) => {
+      res.status(500).json(err);
+    });
+  } catch {
+    next(errors.newHttpError(404, 'Wrong Args'));
+  }
 }
 
 /**
@@ -218,16 +256,20 @@ async function checkAuthWithUsername(req, res) {
  * @param {string} password - password
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-async function checkAuth(req, res) {
-  const { userAddress } = req.query.userAddress;
-  const { providerAddress } = req.query.providerAddress;
-  const { passPhrase } = req.query.phrase;
-  await subscrypt.checkAuth(userAddress, providerAddress, passPhrase).then((resp) => {
-    const arr = refactorRes(resp);
-    res.status(arr[0]).json(arr[1]);
-  }).catch((err) => {
-    res.status(500).json(err);
-  });
+async function checkAuth(req, res, next) {
+  try {
+    const { userAddress } = req.query.userAddress;
+    const { providerAddress } = req.query.providerAddress;
+    const { passPhrase } = req.query.phrase;
+    await subscrypt.checkAuth(userAddress, providerAddress, passPhrase).then((resp) => {
+      const arr = refactorRes(resp);
+      res.status(arr[0]).json(arr[1]);
+    }).catch((err) => {
+      res.status(500).json(err);
+    });
+  } catch {
+    next(errors.newHttpError(404, 'Wrong Args'));
+  }
 }
 
 /**
@@ -236,15 +278,19 @@ async function checkAuth(req, res) {
  * @param {string} password - password
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-async function providerCheckAuth(req, res) {
-  const { providerAddress } = req.query.providerAddress;
-  const { passPhrase } = req.query.phrase;
-  await subscrypt.providerCheckAuth(providerAddress, passPhrase).then((resp) => {
-    const arr = refactorRes(resp);
-    res.status(arr[0]).json(arr[1]);
-  }).catch((err) => {
-    res.status(500).json(err);
-  });
+async function providerCheckAuth(req, res, next) {
+  try {
+    const { providerAddress } = req.query.providerAddress;
+    const { passPhrase } = req.query.phrase;
+    await subscrypt.providerCheckAuth(providerAddress, passPhrase).then((resp) => {
+      const arr = refactorRes(resp);
+      res.status(arr[0]).json(arr[1]);
+    }).catch((err) => {
+      res.status(500).json(err);
+    });
+  } catch {
+    next(errors.newHttpError(404, 'Wrong Args'));
+  }
 }
 
 /**
@@ -253,15 +299,19 @@ async function providerCheckAuth(req, res) {
  * @param {string} password - password
  * @returns {Promise<BooleanResult|Failed>} - Result of request
  */
-async function userCheckAuth(req, res) {
-  const { username } = req.query.username;
-  const { passPhrase } = req.query.phrase;
-  await subscrypt.userCheckAuth(username, passPhrase).then((resp) => {
-    const arr = refactorRes(resp);
-    res.status(arr[0]).json(arr[1]);
-  }).catch((err) => {
-    res.status(500).json(err);
-  });
+async function userCheckAuth(req, res, next) {
+  try {
+    const { username } = req.query.username;
+    const { passPhrase } = req.query.phrase;
+    await subscrypt.userCheckAuth(username, passPhrase).then((resp) => {
+      const arr = refactorRes(resp);
+      res.status(arr[0]).json(arr[1]);
+    }).catch((err) => {
+      res.status(500).json(err);
+    });
+  } catch {
+    next(errors.newHttpError(404, 'Wrong Args'));
+  }
 }
 
 module.exports = {

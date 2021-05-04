@@ -6,7 +6,7 @@ module.exports = {
     parameters: [
       {
         name: 'user',
-        in: 'Address',
+        in: 'query',
         schema: {
           $ref: '#/components/schemas/Address',
         },
@@ -15,7 +15,7 @@ module.exports = {
       },
       {
         name: 'providerAddress',
-        in: 'Address',
+        in: 'query',
         schema: {
           $ref: '#/components/schemas/Address',
         },
@@ -24,9 +24,10 @@ module.exports = {
       },
       {
         name: 'planIndex',
-        in: 'number',
+        in: 'query',
         required: true,
         description: 'Index of plan',
+        example: 0,
       },
     ],
     responses: {
