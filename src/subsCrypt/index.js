@@ -1,30 +1,6 @@
 const subscrypt = require('@oxydev/subscrypt');
 
 /**
- * @typedef PlanConst
- * @property {number} duration
- * @property {number} price
- * @property {number} max_refund_permille
- * @property {bool} disabled
- */
-
-/**
- * @typedef SubscriptionRecord
- * @property {string} provider
- * @property {PlanConst} plan
- * @property {number} plan_index
- * @property {number} subscription_time
- * @property {string[]} characteristics_values_encrypted
- * @property {bool} refunded
- */
-
-/**
- * @typedef Failed
- * @property {string} status Status of request("Failed") in this case
- * @property {*} result Debug Data
- */
-
-/**
  * @typedef PlanFetched
  * @property {string} status Status of request("Fetched") in this case
  * @property {PlanConst} result Plan Const data
@@ -43,22 +19,13 @@ const subscrypt = require('@oxydev/subscrypt');
  */
 
 /**
- * @typedef BooleanResult
- * @property {string} status Status of request("Fetched") in this case
- * @property {bool} result
- */
-
-/**
  * @typedef SubscriptionFetched
  * @property {string} status Status of request("Fetched") in this case
  * @property {SubscriptionRecord[]} result Array of SubscriptionRecords
  */
 
 const refactorRes = (response) => {
-  let status = 400;
-  if (response.status === 'Fetched') status = 200;
-  else if (response.status === 'NotConnected') status = 500;
-
+  const status = response.status === 'Fetched' ? 200 : 500;
   const { result } = response;
   return [status, result];
 };
@@ -80,6 +47,14 @@ exports.checkSubscription = async (req, res) => {
   }).catch((err) => {
     res.status(500).json(err);
   });
+};
+
+/**
+ * check if subscrypt contract is connected or not
+ * @returns {Promise<BooleanResult|Failed>} - Result of request
+ */
+exports.isConnected = async (req, res) => {
+  res.status(200).json(await subscrypt.isConnected());
 };
 
 /**
@@ -142,8 +117,8 @@ exports.retrieveDataWithUsername = async (req, res) => {
  * @returns {Promise<PlanFetched|Failed>} - Return a plan data or error
  */
 exports.getPlanData = async (req, res) => {
-  const providerAddress  = req.params.providerAddress;
-  const planIndex = req.params.planIndex;
+  const { providerAddress } = req.params;
+  const { planIndex } = req.params;
   await subscrypt.getPlanData(providerAddress, planIndex).then((resp) => {
     const arr = refactorRes(resp);
     res.status(arr[0]).json(arr[1]);
@@ -236,7 +211,6 @@ exports.checkAuthWithUsername = async (req, res) => {
   });
 };
 
-
 /**
  * Check password of user for given provider with wallet
  * @param {string} userAddress - Address of User
@@ -289,3 +263,5 @@ exports.userCheckAuth = async (req, res) => {
     res.status(500).json(err);
   });
 };
+
+module.exports = {};

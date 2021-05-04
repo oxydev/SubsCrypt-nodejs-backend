@@ -7,6 +7,7 @@
   "repository": "https://github.com/oxydev/SubsCrypt-nodejs-backend/",
   "scripts": {
     "serve": "node src/server.js",
+    "dev": "nodemon src/server.js",
     "test": "NODE_ENV=test mocha src/**/*.test-*.js --exit",
     "coverage": "nyc npm test"
   },
@@ -14,8 +15,11 @@
     "config": "^3.3.6",
     "express": "4.17.1",
     "morgan": "1.10.0",
+    "@oxydev/subscrypt": "0.0.4",
+    "swagger-jsdoc": "^7.0.0-rc.6",
     "winston": "^3.3.3",
-    "subscrypt": "0.0.3"
+    "swagger-ui-express": "^4.1.6",
+    "nodemon": "^2.0.7"
   },
   "devDependencies": {
     "chai": "4.3.4",
@@ -25,5 +29,9 @@
     "eslint-plugin-import": "^2.22.1",
     "mocha": "8.3.2",
     "nyc": "15.1.0"
+  },
+  "nodemonConfig": {
+    "ext": "js",
+    "delay": 2
   }
 }
