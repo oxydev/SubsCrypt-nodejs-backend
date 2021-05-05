@@ -1,22 +1,28 @@
-'use strict';
-
+global.window = {};
 // API boilerplate
 const express = require('express');
-const app = express();
-const routes = require('./routes');
 
-// Logging
+const app = express();
 const morgan = require('morgan');
+const config = require('config');
+const swaggerUi = require('swagger-ui-express');
+const routes = require('./routes');
+const docs = require('./docs');
+// Logging
 const logger = require('./logger');
 
 // Config
-const config = require('config');
 
 // Set up middleware for request parsing, logging, etc.
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('short', { stream: logger.stream }));
 
+app.use(
+  '/subscrypt-doc',
+  swaggerUi.serve,
+  swaggerUi.setup(docs),
+);
 // Load up the routes
 app.use('/', routes);
 

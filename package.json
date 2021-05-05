@@ -1,28 +1,38 @@
 {
-  "name": "SubsCrypt-nodejs-backend",
+  "name": "subsCrypt-nodejs-backend",
   "main": "src/server.js",
   "version": "0.0.2",
-  "author": "Saber Zafarpoor <szafarpoor@ce.sharif.edu> (https://github.com/saberdotcoder)",
-  "license": "MIT",
-  "repository": "https://github.com/jaredpetersen/nodejs-api-template.git",
+  "author": "Hadi Esna <atomaton00@gmail.com> (https://github.com/HadiEsna),Saber Zafarpoor <szafarpoor@ce.sharif.edu> (https://github.com/saberdotcoder)",
+  "license": "Apache-2.0",
+  "repository": "https://github.com/oxydev/SubsCrypt-nodejs-backend/",
   "scripts": {
     "serve": "node src/server.js",
+    "dev": "nodemon src/server.js",
     "test": "NODE_ENV=test mocha src/**/*.test-*.js --exit",
-    "coverage": "nyc npm test"
+    "coverage": "nyc npm test",
+    "start": "npm run serve"
   },
   "dependencies": {
-    "@polkadot/api": "^4.6.2",
-    "@polkadot/api-contract": "^4.6.2",
-    "@polkadot/extension-dapp": "^0.37.3-14",
     "config": "^3.3.6",
     "express": "4.17.1",
     "morgan": "1.10.0",
-    "winston": "^3.3.3"
+    "@oxydev/subscrypt": "0.0.6",
+    "swagger-jsdoc": "^7.0.0-rc.6",
+    "winston": "^3.3.3",
+    "swagger-ui-express": "^4.1.6",
+    "nodemon": "^2.0.7"
   },
   "devDependencies": {
     "chai": "4.3.4",
     "chai-http": "4.3.0",
+    "eslint": "^7.25.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1",
     "mocha": "8.3.2",
     "nyc": "15.1.0"
+  },
+  "nodemonConfig": {
+    "ext": "js",
+    "delay": 2
   }
 }

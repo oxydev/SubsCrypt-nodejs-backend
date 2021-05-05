@@ -1,13 +1,10 @@
-'use strict';
-
 const chai = require('chai');
-const expect = chai.expect;
+
+const { expect } = chai;
 const errors = require('./index');
 
 describe('Errors - UT', () => {
-
   describe('errorHandler', () => {
-
     it('handles errors with status', (done) => {
       // Stub err
       const errStub = new Error('some error');
@@ -58,11 +55,9 @@ describe('Errors - UT', () => {
       // Run unit under test
       errors.errorHandler(errStub, reqStub, resMock, nextStub);
     });
-
   });
 
   describe('nullRoute()', () => {
-
     it('returns 404 not found', (done) => {
       // Stub req
       const reqStub = null;
@@ -84,11 +79,9 @@ describe('Errors - UT', () => {
       // Run unit under test
       errors.nullRoute(reqStub, resMock, nextStub);
     });
-
   });
 
   describe('newHttpError()', () => {
-
     it('creates a new error', (done) => {
       const err = errors.newHttpError(401, 'unauthorized');
 
@@ -114,7 +107,5 @@ describe('Errors - UT', () => {
       expect(errNoMessage.message).to.equal('');
       done();
     });
-
   });
-
 });
