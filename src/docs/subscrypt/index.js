@@ -12,6 +12,7 @@ const providerCheckAuth = require('./providerCheckAuth');
 const providerCheckAuthWithUsername = require('./providerCheckAuthWithUsername');
 const userCheckAuth = require('./userCheckAuth');
 const userCheckAuthWithUsername = require('./userCheckAuthWithUsername');
+const getPlanCharacteristics = require('./getPlanCharacteristics');
 
 module.exports = {
   paths: {
@@ -56,6 +57,9 @@ module.exports = {
     },
     '/subsCrypt/isConnected': {
       ...isConnected,
+    },
+    '/subsCrypt/getPlanCharacteristics/{providerAddress}/{planIndex}': {
+      ...getPlanCharacteristics,
     },
   },
 };

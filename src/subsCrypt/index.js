@@ -89,12 +89,13 @@ async function getPlanData(req, res, next) {
 
 async function getPlanCharacteristics(req, res, next) {
   try {
-    await subscrypt.getPlanCharacteristics(req.params.providerAddress, req.params.planIndex).then((resp) => {
-      const arr = refactorRes(resp);
-      res.status(arr[0]).json(arr[1]);
-    }).catch((err) => {
-      res.status(500).json(err);
-    });
+    await subscrypt.getPlanCharacteristics(req.params.providerAddress, req.params.planIndex)
+      .then((resp) => {
+        const arr = refactorRes(resp);
+        res.status(arr[0]).json(arr[1]);
+      }).catch(() => {
+        next(errors.newHttpError(404, 'Wrong Args'));
+      });
   } catch {
     next(errors.newHttpError(404, 'Wrong Args'));
   }
