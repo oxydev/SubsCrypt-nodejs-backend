@@ -132,9 +132,7 @@ async function retrieveDataWithUsername(req, res, next) {
  */
 async function getPlanData(req, res, next) {
   try {
-    const { providerAddress } = req.params;
-    const { planIndex } = req.params;
-    await subscrypt.getPlanData(providerAddress, planIndex).then((resp) => {
+    await subscrypt.getPlanData(req.params.providerAddress, req.params.planIndex).then((resp) => {
       const arr = refactorRes(resp);
       res.status(arr[0]).json(arr[1]);
     }).catch((err) => {
@@ -173,8 +171,7 @@ async function retrieveWholeDataWithUsername(req, res, next) {
  */
 async function isUsernameAvailable(req, res, next) {
   try {
-    const { username } = req.params.username;
-    await subscrypt.isUsernameAvailable(username).then((resp) => {
+    await subscrypt.isUsernameAvailable(req.params.username).then((resp) => {
       const arr = refactorRes(resp);
       res.status(arr[0]).json(arr[1]);
     }).catch((err) => {
@@ -193,8 +190,7 @@ async function isUsernameAvailable(req, res, next) {
  */
 async function userCheckAuthWithUsername(req, res, next) {
   try {
-    const { username, passPhrase } = req.query;
-    await subscrypt.userCheckAuthWithUsername(username, passPhrase).then((resp) => {
+    await subscrypt.userCheckAuthWithUsername(req.params.username, req.query.passPhrase).then((resp) => {
       const arr = refactorRes(resp);
       res.status(arr[0]).json(arr[1]);
     }).catch((err) => {
@@ -213,9 +209,7 @@ async function userCheckAuthWithUsername(req, res, next) {
  */
 async function providerCheckAuthWithUsername(req, res, next) {
   try {
-    const { username } = req.query.username;
-    const { passPhrase } = req.query.phrase;
-    await subscrypt.providerCheckAuthWithUsername(username, passPhrase).then((resp) => {
+    await subscrypt.providerCheckAuthWithUsername(req.params.username, req.query.phrase).then((resp) => {
       const arr = refactorRes(resp);
       res.status(arr[0]).json(arr[1]);
     }).catch((err) => {
@@ -235,10 +229,7 @@ async function providerCheckAuthWithUsername(req, res, next) {
  */
 async function checkAuthWithUsername(req, res, next) {
   try {
-    const { username } = req.query.username;
-    const { providerAddress } = req.query.providerAddress;
-    const { passPhrase } = req.query.passPhrase;
-    await subscrypt.checkAuthWithUsername(username, providerAddress, passPhrase).then((resp) => {
+    await subscrypt.checkAuthWithUsername(req.params.username, req.query.providerAddress, req.query.passPhrase).then((resp) => {
       const arr = refactorRes(resp);
       res.status(arr[0]).json(arr[1]);
     }).catch((err) => {
