@@ -1,8 +1,8 @@
 module.exports = {
   get: {
     tags: ['User Info Getters'],
-    description: 'Check if the given user has a valid active subscription in the given plan index using username.',
-    operationId: 'checkSubscriptionWithUsername',
+    description: 'Returning username of given address',
+    operationId: 'getUsername',
     parameters: [
       {
         name: 'username',

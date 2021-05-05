@@ -54,14 +54,13 @@ async function isConnected(req, res, next) {
 
 async function checkSubscriptionWithUsername(req, res, next) {
   try {
-    const { username } = req.params.username;
-    const { providerAddress } = req.query.providerAddress;
-    const { phrase } = req.query.phrase;
-    await subscrypt.checkSubscriptionWithUsername(username, providerAddress, phrase)
+    await subscrypt.checkSubscriptionWithUsername(req.params.username,
+      req.query.providerAddress, req.query.phrase)
       .then((resp) => {
         const arr = refactorRes(resp);
         if (arr[0] === 200) res.status(arr[0]).json(arr[1]);
         else next(errors.newHttpError(arr[0], arr[1]));
+        // todo check if fix in next version of contract
       }).catch(() => {
         next(errors.newHttpError(404, 'Wrong Args'));
       });
@@ -70,19 +69,14 @@ async function checkSubscriptionWithUsername(req, res, next) {
   }
 }
 
-/**
- * returns username of given address
- * @param {string} sender - Address of user
- * @returns {Promise<string|Failed>} - Result of request
- */
-async function getUsernameByAddress(req, res, next) {
+async function getUsername(req, res, next) {
   try {
-    const { address } = req.params.address;
-    await subscrypt.getUsernameByAddress(address).then((resp) => {
+    await subscrypt.getUsername(req.params.address).then((resp) => {
       const arr = refactorRes(resp);
-      res.status(arr[0]).json(arr[1]);
-    }).catch((err) => {
-      res.status(500).json(err);
+      if (arr[0] === 200) res.status(arr[0]).json(arr[1]);
+      else res.status(200);
+    }).catch(() => {
+      next(errors.newHttpError(404, 'Wrong Args'));
     });
   } catch {
     next(errors.newHttpError(404, 'Wrong Args'));
@@ -304,7 +298,7 @@ module.exports = {
   checkSubscriptionWithUsername,
   isConnected,
   isUsernameAvailable,
-  getUsernameByAddress,
+  getUsernameByAddress: getUsername,
   retrieveDataWithUsername,
   retrieveWholeDataWithUsername,
   getPlanData,
