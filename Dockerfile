@@ -17,4 +17,4 @@ COPY ./ .
 EXPOSE 3070
 
 # command to run when intantiate an image
-CMD ["npm run serve",""]
+CMD ["npm","start"]

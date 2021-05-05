@@ -144,6 +144,25 @@ async function getPlanData(req, res, next) {
 }
 
 /**
+ * Getting Plan Data of a provider
+ * @param {string} providerAddress - Address of Provider
+ * @param {number} planIndex - plan_index
+ * @returns {Promise<PlanFetched|Failed>} - Return a plan data or error
+ */
+ async function getPlanCharacteristics(req, res, next) {
+  try {
+    await subscrypt.getPlanCharacteristics(req.params.providerAddress, req.params.planIndex).then((resp) => {
+      const arr = refactorRes(resp);
+      res.status(arr[0]).json(arr[1]);
+    }).catch((err) => {
+      res.status(500).json(err);
+    });
+  } catch {
+    next(errors.newHttpError(404, 'Wrong Args'));
+  }
+}
+
+/**
  * Retrieving Whole Subscription Data With Password of SubsCrypt dashboard
  * @param {string} username - Username
  * @param {string} password - password
@@ -320,4 +339,5 @@ module.exports = {
   retrieveDataWithUsername,
   retrieveWholeDataWithUsername,
   getPlanData,
+  getPlanCharacteristics,
 };
