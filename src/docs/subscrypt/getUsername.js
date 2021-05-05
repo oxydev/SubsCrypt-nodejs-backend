@@ -1,33 +1,17 @@
 module.exports = {
   get: {
     tags: ['User Info Getters'],
-    description: 'Check if the given user has a valid active subscription in the given plan index.',
-    operationId: '/checkSubscription',
+    description: 'Returning username of given address',
+    operationId: 'getUsername',
     parameters: [
       {
-        name: 'user',
-        in: 'query',
+        name: 'address',
+        in: 'path',
         schema: {
           $ref: '#/components/schemas/Address',
         },
         required: true,
-        description: 'Address Of User',
-      },
-      {
-        name: 'providerAddress',
-        in: 'query',
-        schema: {
-          $ref: '#/components/schemas/Address',
-        },
-        required: true,
-        description: 'Address Of Provider',
-      },
-      {
-        name: 'planIndex',
-        in: 'query',
-        required: true,
-        description: 'Index of plan',
-        example: 0,
+        description: 'Address Of User or provider',
       },
     ],
     responses: {
@@ -37,6 +21,19 @@ module.exports = {
           'application/json': {
             schema: {
               $ref: '#/components/schemas/BooleanResult',
+            },
+          },
+        },
+      },
+      404: {
+        description: 'Result of request is fetched from blockchain',
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/Failed',
+              example: {
+                message: 'WrongArgs',
+              },
             },
           },
         },

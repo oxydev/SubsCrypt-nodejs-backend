@@ -8,7 +8,7 @@ router.get('/userCheckAuth', tasks.userCheckAuth);
 router.get('/providerCheckAuth', tasks.providerCheckAuth);
 router.get('/checkSubscription', tasks.checkSubscription);
 router.get('/checkSubscription/:username', tasks.checkSubscriptionWithUsername);
-router.get('/getUsernameByAddress/:address', tasks.getUsernameByAddress);
+router.get('/getUsername/:address', tasks.getUsername);
 router.get('/getPlanData/:providerAddress/:planIndex', tasks.getPlanData);
 router.get('/isUsernameAvailable/:username', tasks.isUsernameAvailable);
 router.get('/userCheckAuth/:username', tasks.userCheckAuthWithUsername);
