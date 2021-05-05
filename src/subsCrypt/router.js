@@ -17,6 +17,7 @@ router.get('/checkAuth', tasks.checkAuth);
 router.get('/checkAuth/:username', tasks.checkAuthWithUsername);
 router.get('/retrieveDataWithUsername', tasks.retrieveWholeDataWithUsername);
 router.get('/retrieveDataWithUsername/:providerAddress', tasks.retrieveDataWithUsername);
+router.get('/isConnected', tasks.isConnected);
 
 // Export the router
 module.exports = router;

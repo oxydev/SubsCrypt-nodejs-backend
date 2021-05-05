@@ -53,9 +53,13 @@ module.exports = {
             example: 16801129209000,
           },
           characteristics_values_encrypted: {
-            type: 'string[]',
-            description: 'Value of characteristics',
-            example: ['val', 'val2'],
+            type: 'array',
+            items: {
+              type: 'string',
+              description: 'each value encrypted',
+              example: 'somevalue',
+            },
+            description: 'Array of Values of characteristics encrypted by public key of provider',
           },
           refunded: {
             type: 'bool',
@@ -65,26 +69,27 @@ module.exports = {
         },
       },
       BooleanResult: {
-        status: {
-          type: 'string',
-          description: 'Status of request("Fetched") in this case',
-          example: 'Fetched',
-        },
-        result: {
-          type: 'bool',
-          example: false,
-        },
+        type: 'bool',
+        example: false,
       },
       Failed: {
-        status: {
+        type: 'string',
+        description: 'Status of request("NotConnected" or "Failed" or "WrongArgs") in this case',
+        example: 'WrongArgs',
+      },
+      Username: {
+        type: 'string',
+        description: 'Username of user or provider in contract',
+        example: 'Hadi',
+      },
+      Characteristics: {
+        type: 'array',
+        items: {
           type: 'string',
-          description: 'Status of request("NotConnected" or "Failed") in this case',
-          example: 'Failed',
+          description: 'each key',
+          example: 'key1',
         },
-        result: {
-          type: 'string',
-          description: 'More info about request',
-        },
+        description: 'Array of keys of characteristics of that plan',
       },
     },
   },

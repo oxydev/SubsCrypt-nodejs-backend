@@ -30,53 +30,41 @@ const refactorRes = (response) => {
   return [status, status === 200 ? result : response.status];
 };
 
-/**
- * Check if the given user has a valid active subscription in the given plan index.
- * @param {string} userAddress - Address Of User
- * @param {string} providerAddress - Address of Provider
- * @param {number} planIndex - plan_index
- * @returns {Promise<BooleanResult|Failed>} - Result of request
- */
 async function checkSubscription(req, res, next) {
   try {
-    console.log(req.query.user, req.query.providerAddress, req.query.planIndex);
-    await subscrypt.checkSubscription(req.query.user, req.query.providerAddress, req.query.planIndex).then((resp) => {
-      const arr = refactorRes(resp);
-      res.status(arr[0]).json(arr[1]);
-    }).catch((err) => {
-      res.status(500).json(err);
-    });
+    await subscrypt.checkSubscription(req.query.user, req.query.providerAddress, req.query.planIndex)
+      .then((resp) => {
+        const arr = refactorRes(resp);
+        if (arr[0] === 200) res.status(arr[0]).json(arr[1]);
+        else next(errors.newHttpError(arr[0], arr[1]));
+      }).catch(() => {
+        next(errors.newHttpError(404, 'Wrong Args'));
+      });
   } catch {
     next(errors.newHttpError(404, 'Wrong Args'));
   }
 }
 
-/**
- * check if subscrypt contract is connected or not
- * @returns {Promise<BooleanResult|Failed>} - Result of request
- */
-async function isConnected(req, res) {
+async function isConnected(req, res, next) {
+  res.setTimeout(5000, () => {
+    next(errors.newHttpError(500, 'NotConnected'));
+  });
   res.status(200).json(await subscrypt.isConnected());
 }
 
-/**
- * Check if the given user has a valid active subscription in the given plan index.
- * @param {string} username- Username
- * @param {string} providerAddress - Address of Provider
- * @param {number} planIndex - plan_index
- * @returns {Promise<BooleanResult|Failed>} - Result of request
- */
 async function checkSubscriptionWithUsername(req, res, next) {
   try {
     const { username } = req.params.username;
     const { providerAddress } = req.query.providerAddress;
     const { phrase } = req.query.phrase;
-    await subscrypt.checkSubscriptionWithUsername(username, providerAddress, phrase).then((resp) => {
-      const arr = refactorRes(resp);
-      res.status(arr[0]).json(arr[1]);
-    }).catch((err) => {
-      res.status(500).json(err);
-    });
+    await subscrypt.checkSubscriptionWithUsername(username, providerAddress, phrase)
+      .then((resp) => {
+        const arr = refactorRes(resp);
+        if (arr[0] === 200) res.status(arr[0]).json(arr[1]);
+        else next(errors.newHttpError(arr[0], arr[1]));
+      }).catch(() => {
+        next(errors.newHttpError(404, 'Wrong Args'));
+      });
   } catch {
     next(errors.newHttpError(404, 'Wrong Args'));
   }
