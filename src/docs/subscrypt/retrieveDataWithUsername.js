@@ -1,17 +1,36 @@
 module.exports = {
   get: {
     tags: ['User Info Getters'],
-    description: 'Returning username of given address',
-    operationId: 'getUsername',
+    description: 'Retrieving Subscription Data to given provider With Password.',
+    operationId: 'retrieveDataWithUsername',
     parameters: [
       {
-        name: 'address',
+        name: 'providerAddress',
         in: 'path',
         schema: {
           $ref: '#/components/schemas/Address',
         },
         required: true,
-        description: 'Address Of User or provider',
+        description: 'Address Of Provider',
+      },
+      {
+        name: 'username',
+        in: 'query',
+        schema: {
+          $ref: '#/components/schemas/Username',
+        },
+        required: true,
+        description: 'Username of user',
+      },
+      {
+        name: 'phrase',
+        in: 'query',
+        schema: {
+          $ref: '#/components/schemas/Password',
+        },
+        required: true,
+        description: 'Password of user for given provider',
+        example: 'someThings',
       },
     ],
     responses: {
@@ -20,7 +39,12 @@ module.exports = {
         content: {
           'application/json': {
             schema: {
-              $ref: '#/components/schemas/BooleanResult',
+              type: 'array',
+              items: {
+                $ref: '#/components/schemas/SubscriptionRecord',
+                description: 'Each Subscription',
+              },
+              description: 'Array of SubscriptionRecords of that user',
             },
           },
         },

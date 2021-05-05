@@ -1,17 +1,27 @@
 module.exports = {
   get: {
     tags: ['User Info Getters'],
-    description: 'Returning username of given address',
-    operationId: 'getUsername',
+    description: 'Check password of user for SubsCrypt Dashboard with username.',
+    operationId: 'userCheckAuth',
     parameters: [
       {
-        name: 'address',
+        name: 'username',
         in: 'path',
         schema: {
-          $ref: '#/components/schemas/Address',
+          $ref: '#/components/schemas/Username',
         },
         required: true,
-        description: 'Address Of User or provider',
+        description: 'Username Of user',
+      },
+      {
+        name: 'passPhrase',
+        in: 'query',
+        schema: {
+          $ref: '#/components/schemas/Password',
+        },
+        required: true,
+        description: 'Password of User',
+        example: 'someThings',
       },
     ],
     responses: {

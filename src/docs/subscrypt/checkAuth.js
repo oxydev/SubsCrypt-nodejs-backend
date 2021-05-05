@@ -1,17 +1,36 @@
 module.exports = {
   get: {
     tags: ['User Info Getters'],
-    description: 'Returning username of given address',
-    operationId: 'getUsername',
+    description: 'Check password of user for given provider with Address.',
+    operationId: 'checkAuth',
     parameters: [
       {
-        name: 'address',
-        in: 'path',
+        name: 'userAddress',
+        in: 'query',
         schema: {
           $ref: '#/components/schemas/Address',
         },
         required: true,
-        description: 'Address Of User or provider',
+        description: 'Address Of User',
+      },
+      {
+        name: 'providerAddress',
+        in: 'query',
+        schema: {
+          $ref: '#/components/schemas/Address',
+        },
+        required: true,
+        description: 'Address Of Provider',
+      },
+      {
+        name: 'phrase',
+        in: 'query',
+        schema: {
+          $ref: '#/components/schemas/Password',
+        },
+        required: true,
+        description: 'Password of user for given provider',
+        example: 'someThings',
       },
     ],
     responses: {

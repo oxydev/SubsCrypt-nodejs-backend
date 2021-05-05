@@ -39,7 +39,7 @@ module.exports = {
             example: '5Dyu5YxLufavjPg8vP31BhKs5xz8ncdkQcNdGwf5XtW4C9Ym',
           },
           plan: {
-            type: 'PlanConst',
+            $ref: '#/components/schemas/PlanConst',
             description: 'Plan information',
           },
           plan_index: {
@@ -81,6 +81,11 @@ module.exports = {
         type: 'string',
         description: 'Username of user or provider in contract',
         example: 'Hadi',
+      },
+      Password: {
+        type: 'string',
+        description: 'Password of user or provider in contract',
+        example: 'someSecurePhrase',
       },
       Characteristics: {
         type: 'array',

@@ -1,17 +1,27 @@
 module.exports = {
   get: {
-    tags: ['User Info Getters'],
-    description: 'Returning username of given address',
-    operationId: 'getUsername',
+    tags: ['Provider Info Getters'],
+    description: 'Getting Plan Data of a provider.',
+    operationId: 'getPlanData',
     parameters: [
       {
-        name: 'address',
+        name: 'providerAddress',
         in: 'path',
         schema: {
           $ref: '#/components/schemas/Address',
         },
         required: true,
-        description: 'Address Of User or provider',
+        description: 'Address Of Provider',
+      },
+      {
+        name: 'planIndex',
+        in: 'path',
+        schema: {
+          type: 'number',
+        },
+        required: true,
+        description: 'Index of plan (from 0)',
+        example: '1',
       },
     ],
     responses: {
@@ -20,7 +30,8 @@ module.exports = {
         content: {
           'application/json': {
             schema: {
-              $ref: '#/components/schemas/BooleanResult',
+              $ref: '#/components/schemas/PlanConst',
+              description: 'Plan info',
             },
           },
         },

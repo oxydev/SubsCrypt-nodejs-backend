@@ -1,17 +1,17 @@
 module.exports = {
   get: {
     tags: ['User Info Getters'],
-    description: 'Returning username of given address',
-    operationId: 'getUsername',
+    description: 'Returning if username is available or not',
+    operationId: 'isUsernameAvailable',
     parameters: [
       {
-        name: 'address',
+        name: 'username',
         in: 'path',
         schema: {
-          $ref: '#/components/schemas/Address',
+          $ref: '#/components/schemas/Username',
         },
         required: true,
-        description: 'Address Of User or provider',
+        description: 'UserName',
       },
     ],
     responses: {
