@@ -1,0 +1,5 @@
+version: '3.8'
+services:
+  node:
+    network_mode: host
+    image: "oxydev/subscrypt_nodejs:latest"
