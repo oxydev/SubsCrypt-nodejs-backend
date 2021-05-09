@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  web:
+  node:
     network_mode: host
     build:
       context: ./
