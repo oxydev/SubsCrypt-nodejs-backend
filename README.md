@@ -2,6 +2,7 @@
 <img src="https://oxydev.github.io/SubsCrypt-docs/images/logo2.png" width="500">
 
 [![Test](https://github.com/oxydev/SubsCrypt-nodejs-backend/actions/workflows/node.js.yml/badge.svg)](https://github.com/oxydev/SubsCrypt-nodejs-backend/actions/workflows/node.js.yml)
+[![Docker Image CI](https://github.com/oxydev/SubsCrypt-nodejs-backend/actions/workflows/docker-hub-test.yml/badge.svg)](https://github.com/oxydev/SubsCrypt-nodejs-backend/actions/workflows/docker-hub-test.yml)
 
 # What is SubsCrypt-nodejs-backend?
 We provide an express-js API wrapper over the [SubsCrypt-npm-library](https://github.com/oxydev/SubsCrypt-npm-library/) to
