@@ -32,7 +32,7 @@ jobs:
         with:
           file: ./Dockerfile
           push: true
-          tags: oxydev/SubsCryptNodeJs:latest
+          tags: oxydev/subscrypt_nodejs:latest
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
