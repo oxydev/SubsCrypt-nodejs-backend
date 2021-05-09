@@ -15,7 +15,7 @@ Or you can use our testing server in [here](http://206.189.154.160:3000).
 And also stay tunned for the updates and the official product.
 
 
-# How to Run?
+# How to Run(using npm)?
 
 First clone the project and then install the required packages:
 ```
@@ -23,14 +23,34 @@ npm install
 npm run serve
 ```
 
-# How to run with docker-compose
+# How to run(using docker-compose)?
 
 First you need Docker and Docker Compose installed on your system. for ubuntu : [Docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04) (steps 1 and 2), [Docker Compose](https://www.digitalocean.com/community/tutorials/how-to-install-docker-compose-on-ubuntu-18-04) (step 1)
 
-For building the image:
-
+Now you need to run this command to run the server(it will fetch the latest image of project):
+```bash
+docker-compose up
 ```
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose build
+# Building your own image
+For building the image of your code, use this as your `docker-compose.yml` file:
+```
+ersion: '3.8'
+services:
+  node:
+    network_mode: host
+    build:
+      context: ./
+      target: dev
+    volumes:
+      - .:/usr/src/app
+    command: npm run start
+    environment:
+      DEBUG: nodejs-docker-express:* 
+```
+
+Then, run this command:
+```bash
+docker-compose build
 ```
 
 The output will be something like this:
@@ -58,7 +78,7 @@ Building node
 ```
 
 And then you can run your image with ths command:
-```
+```bash
 docker-compose up
 ```
 

@@ -2,12 +2,4 @@ version: '3.8'
 services:
   node:
     network_mode: host
-    build:
-      context: ./
-      target: dev
-    volumes:
-      - .:/usr/src/app
-    command: npm run start
-    environment:
-      NODE_ENV: development
-      DEBUG: nodejs-docker-express:*
+    image: "oxydev/subscrypt_nodejs:latest"
