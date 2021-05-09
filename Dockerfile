@@ -10,6 +10,7 @@ COPY . .
 #expose the port
 EXPOSE 3000
 
-RUN npm ci
+RUN npm install
 
-CMD ["npm", "start"]
+RUN npm start
+
