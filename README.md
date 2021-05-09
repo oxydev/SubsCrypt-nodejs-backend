@@ -41,7 +41,6 @@ services:
     network_mode: host
     build:
       context: ./
-      target: dev
     volumes:
       - .:/usr/src/app
     command: npm run start
