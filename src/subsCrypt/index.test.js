@@ -27,6 +27,8 @@ const {testMetaData, config} = require('@oxydev/subscrypt')
 const {routes} = require('./router')
 
 describe('Getting Data Test', () => {
+    let userWholeData;
+
     before(() => {
         //todo
         // Init Timeout
@@ -47,42 +49,93 @@ describe('Getting Data Test', () => {
         return beginString + replace + endString;
     }
 
-    it('should ', function () {
-        chai.request(server)
+    let getItWithTimeout = (name, func) => {
+        it(name, func).timeout(testMetaData.REQUEST_TIMEOUT);
+    }
+
+    let getResult = async (route, status, query) => {
+        let res = await chai.request(server)
             .get(MAIN_ROUTE + routes.isConnected)
-            .end(((err, res) => {
-                expect(res).to.have.status(200)
-            }))
-    });
+            .query(query)
+        expect(res).to.have.status(status)
+        return res;
+    }
+
+    let isResExpected = (res, object) => {
+        expect(res.body.message).to.equal(object);
+    }
+
+    let isResObject = (res) => isResExpected(res, testMetaData.SUCCESS_STATUS)
+
+    let isResSuccess = (res) => {
+        expect(res.body.message).to.equal(testMetaData.SUCCESS_STATUS);
+    }
+
+    let getQuery = (userAddress, phrase, providerAddress) => {
+        return {userAddress, phrase, providerAddress}
+    }
+
+    getItWithTimeout('should be Connected', async () => {
+        await getResult(routes.isConnected, 200)
+    })
 
     describe('Check User Authentication', (done) => {
-        it('should Authenticate User Address With Password', async function () {
-            // let result = await subscryptDataGetter.userCheckAuth(userAddress, passWord);
-            // assert.equal(result.status, SUCCESS_STATUS);
-            chai.request(server)
-                .get(MAIN_ROUTE + routes.userCheckAuth)
-                .query({userAddress: testMetaData.userAddress, phrase: testMetaData.passWord})
-                .end(((err, res) => {
-                    expect(res).to.have.status(200)
-                    expect(res.body).to.be.an('object');
-                    expect(res.body.message).to.equal(testMetaData.SUCCESS_STATUS);
-                    done();
-                }))
-        }).timeout(testMetaData.REQUEST_TIMEOUT);
+        getItWithTimeout('should Authenticate User Address With Password', async () => {
+            let query = getQuery(testMetaData.userAddress, testMetaData.passWord)
+            let result = await getResult(routes.userCheckAuth, 200, query)
+            isResObject(result)
+            isResSuccess(result)
+            done();
+        })
 
-        it('should Authenticate Username With Password', async function () {
-            // let result = await subscryptDataGetter.userCheckAuthWithUsername(userName, passWord);
-            // assert.equal(result.status, SUCCESS_STATUS);
+        getItWithTimeout('should Authenticate Username With Password', async () => {
             let newUrl = replaceLast('username', testMetaData.username, routes.userCheckAuthWithUsername)
-            chai.request(server)
-                .get(MAIN_ROUTE + newUrl)
-                .query({passPhrase: testMetaData.passWord})
-                .end(((err, res) => {
-                    expect(res).to.have.status(200)
-                    expect(res.body).to.be.an('object');
-                    expect(res.body.message).to.equal(testMetaData.SUCCESS_STATUS);
-                    done();
-                }))
-        }).timeout(testMetaData.REQUEST_TIMEOUT);
+            let query = {passPhrase: testMetaData.passWord};
+            let result = await getResult(newUrl, 200, query)
+            isResObject(result)
+            isResSuccess(result)
+            done();
+        })
     })
+
+    describe('Check Getting The Data Of The User', (done) => {
+        getItWithTimeout('should Retrieve Whole Data', async () => {
+            let query = getQuery(testMetaData.username, testMetaData.passWord)
+            let result = await getResult(routes.retrieveWholeDataWithUsername, 200, query)
+            isResObject(result)
+            userWholeData = result.body.message;
+            done();
+        })
+
+        getItWithTimeout('should Retrieve Data', async () => {
+            let route = replaceLast('providerAddress', userWholeData[0].provider, routes.retrieveDataWithUsername)
+            let query = getQuery(testMetaData.username, testMetaData.passWord)
+            let result = await getResult(route, 200, query)
+            let expectedResult = userWholeData.filter(value => value.provider === userWholeData[0].provider)
+            isResObject(result)
+            isResExpected(result, expectedResult)
+        })
+    })
+
+    describe('Check Checking Auth Of User & Its Providers', () => {
+        getItWithTimeout('should CheckAuth Using User Address', async () => {
+            for (let userWholeDatum of userWholeData) {
+                let query = getQuery(userAddress, passWord, userWholeDatum.provider)
+                let result = getResult(routes.checkAuth, 200, query)
+                isResObject(result)
+                isResSuccess(result)
+            }
+        })
+
+        getItWithTimeout('should CheckAuth Using User Name', async () => {
+            for (let userWholeDatum of userWholeData) {
+                let route = replaceLast('username', username, routes.userCheckAuthWithUsername)
+                let query = {providerAddress: userWholeDatum.provider, passPhrase: passWord}
+                let result = await getResult(route, 200, query)
+                isResSuccess(result)
+            }
+        })
+    })
+
+
 })
