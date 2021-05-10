@@ -109,7 +109,7 @@ describe('Getting Data Test', () => {
 
         getItWithTimeout('should Authenticate Username With Password', async () => {
             let newUrl = replaceLast('username', testMetaData.username, routes.userCheckAuthWithUsername)
-            let query = {passPhrase: testMetaData.passWord};
+            let query = getQuery(null, passWord)
             let result = await getResult(newUrl, 200, query)
             isResObject(result)
             isResSuccess(result)
@@ -149,7 +149,7 @@ describe('Getting Data Test', () => {
         getItWithTimeout('should CheckAuth Using User Name', async () => {
             for (let userWholeDatum of userWholeData) {
                 let route = replaceLast('username', username, routes.userCheckAuthWithUsername)
-                let query = {providerAddress: userWholeDatum.provider, passPhrase: passWord}
+                let query = getQuery(null, passWord, userWholeDatum.provider)
                 let result = await getResult(route, 200, query)
                 isResSuccess(result)
             }
