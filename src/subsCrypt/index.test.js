@@ -47,41 +47,42 @@ describe('Getting Data Test', () => {
 
   const replaceLast = (find, replace, string) => {
     const lastIndex = string.lastIndexOf(find);
-
     if (lastIndex === -1) {
       return string;
     }
 
-    const beginString = string.substring(0, lastIndex);
+    const beginString = string.substring(0, lastIndex - 1);
     const endString = string.substring(lastIndex + find.length);
 
     return beginString + replace + endString;
   };
 
   const getItWithTimeout = (name, func) => {
-    it(name, func).timeout(testMetaData.REQUEST_TIMEOUT);
+    it(name, func).timeout(testMetaData.REQUEST_TIMEOUT * 3);
   };
 
   const getResult = async (route, status, query) => {
     const res = await chai.request(server)
-      .get(MAIN_ROUTE + routes.isConnected)
+      .get(MAIN_ROUTE + route)
       .query(query);
     expect(res).to.have.status(status);
     return res;
   };
 
   const isResExpected = (res, object) => {
-    expect(res.body.message).to.equal(object);
+    expect(res.body).to.deep.equal(object);
   };
 
   const isResObject = (res) => {
     expect(res.body).to.be.an('object');
   };
 
-  const isResSuccess = (res) => isResExpected(res, testMetaData.SUCCESS_STATUS);
+  const isResSuccess = (res) => {
+    expect(res.body.message).to.equal(testMetaData.SUCCESS_STATUS);
+  };
 
-  const getQuery = (userAddress, phrase, providerAddress, planIndex) => ({
-    userAddress, phrase, providerAddress, planIndex,
+  const getQuery = (username, userAddress, phrase, providerAddress, planIndex) => ({
+    username, userAddress, phrase, providerAddress, planIndex,
   });
 
   getItWithTimeout('should be Connected', async () => {
@@ -89,58 +90,51 @@ describe('Getting Data Test', () => {
   });
 
   describe('Check UserName And UserAddress Validity', () => {
-    getItWithTimeout('should User Be Available', async (done) => {
-      const route = replaceLast(paramsNames.username, username, routes.isUsernameAvailable);
+    getItWithTimeout('should User Be Available', async () => {
+      const route = replaceLast(paramsNames.username, testMetaData.username, routes.isUsernameAvailable);
       const query = {};
       const result = await getResult(route, responseCodes.success, query);
-      isResSuccess(result);
-      done();
+      isResExpected(result, false);
     });
 
-    getItWithTimeout('should The Address Be For The User', async (done) => {
-      const route = replaceLast(paramsNames.userAddress, username, routes.getUsername);
-      const query = {};
-      const result = await getResult(route, responseCodes.success, query);
-      isResSuccess(result);
-      isResExpected(result, username);
-      done();
-    });
+    // getItWithTimeout('should The Address Be For The User', async (done) => {
+    //   const route = replaceLast(paramsNames.userAddress, testMetaData.username, routes.getUsername);
+    //   const query = {};
+    //   const result = await getResult(route, responseCodes.success, query);
+    //   isResObject(result);
+    //   isResExpected(result, testMetaData.username);
+    //   done();
+    // });
   });
 
-  describe('Check User Authentication', (done) => {
+  describe('Check User Authentication', () => {
     getItWithTimeout('should Authenticate User Address With Password', async () => {
-      const query = getQuery(testMetaData.userAddress, testMetaData.passWord);
+      const query = getQuery(null, testMetaData.userAddress, testMetaData.passWord);
       const result = await getResult(routes.userCheckAuth, responseCodes.success, query);
-      isResObject(result);
-      isResSuccess(result);
-      done();
+      isResExpected(result, true);
     });
 
     getItWithTimeout('should Authenticate Username With Password', async () => {
       const newUrl = replaceLast(paramsNames.username, testMetaData.username, routes.userCheckAuthWithUsername);
-      const query = getQuery(null, passWord);
+      const query = getQuery(null, null, testMetaData.passWord);
       const result = await getResult(newUrl, responseCodes.success, query);
-      isResObject(result);
-      isResSuccess(result);
-      done();
+      isResExpected(result, true);
     });
   });
 
-  describe('Check Getting The Data Of The User', (done) => {
+  describe('Check Getting The Data Of The User', () => {
     getItWithTimeout('should Retrieve Whole Data', async () => {
-      const query = getQuery(testMetaData.username, testMetaData.passWord);
+      const query = getQuery(testMetaData.username, null, testMetaData.passWord);
       const result = await getResult(routes.retrieveWholeDataWithUsername, responseCodes.success, query);
-      isResObject(result);
-      userWholeData = result.body.message;
-      done();
+
+      userWholeData = result.body;
     });
 
     getItWithTimeout('should Retrieve Data', async () => {
       const route = replaceLast(paramsNames.providerAddress, userWholeData[0].provider, routes.retrieveDataWithUsername);
-      const query = getQuery(testMetaData.username, testMetaData.passWord);
+      const query = getQuery(testMetaData.username, null, testMetaData.passWord);
       const result = await getResult(route, responseCodes.success, query);
       const expectedResult = userWholeData.filter((value) => value.provider === userWholeData[0].provider);
-      isResObject(result);
       isResExpected(result, expectedResult);
     });
   });
@@ -148,17 +142,16 @@ describe('Getting Data Test', () => {
   describe('Check Checking Auth Of User & Its Providers', () => {
     getItWithTimeout('should CheckAuth Using User Address', async () => {
       for (const userWholeDatum of userWholeData) {
-        const query = getQuery(userAddress, passWord, userWholeDatum.provider);
-        const result = getResult(routes.checkAuth, responseCodes.success, query);
-        isResObject(result);
-        isResSuccess(result);
+        const query = getQuery(null, testMetaData.userAddress, testMetaData.passWord, userWholeDatum.provider);
+        const result = await getResult(routes.checkAuth, responseCodes.success, query);
+        isResExpected(result, true);
       }
     });
 
     getItWithTimeout('should CheckAuth Using User Name', async () => {
       for (const userWholeDatum of userWholeData) {
-        const route = replaceLast(paramsNames.username, username, routes.userCheckAuthWithUsername);
-        const query = getQuery(null, passWord, userWholeDatum.provider);
+        const route = replaceLast(paramsNames.username, testMetaData.username, routes.userCheckAuthWithUsername);
+        const query = getQuery(null, null, testMetaData.passWord, userWholeDatum.provider);
         const result = await getResult(route, responseCodes.success, query);
         isResSuccess(result);
       }
