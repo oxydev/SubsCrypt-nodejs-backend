@@ -1,30 +1,30 @@
 window = global;
-const {MAIN_ROUTE} = require("./router");
+const { MAIN_ROUTE } = require('./router');
 
 const chai = require('chai');
 
-const {expect} = chai;
+const { expect } = chai;
 const chaiHttp = require('chai-http');
 const server = require('../server');
 
 chai.use(chaiHttp);
 describe('Errors - IT', () => {
-    describe('null route', () => {
-        it('returns a 404 response', (done) => {
-            chai.request(server)
-                .get('/nonexistentroute')
-                .end((err, res) => {
-                    expect(res).to.have.status(404);
-                    expect(res.body).to.be.an('object');
-                    expect(res.body.message).to.equal('not found');
-                    done();
-                });
+  describe('null route', () => {
+    it('returns a 404 response', (done) => {
+      chai.request(server)
+        .get('/nonexistentroute')
+        .end((err, res) => {
+          expect(res).to.have.status(404);
+          expect(res.body).to.be.an('object');
+          expect(res.body.message).to.equal('not found');
+          done();
         });
     });
+  });
 });
 
-const {testMetaData, config} = require('@oxydev/subscrypt')
-const {routes} = require('./router')
+const { testMetaData, config } = require('@oxydev/subscrypt');
+const { routes } = require('./router');
 
 const paramsNames = {
     userAddress: 'address',
@@ -36,53 +36,53 @@ const responseCodes = {
     success: 200
 }
 describe('Getting Data Test', () => {
-    let userWholeData;
+  let userWholeData;
 
-    before(() => {
-        //todo
-        // Init Timeout
-        // Init Contract Address
-        config.address = testMetaData.contractAddress;
-    })
+  before(() => {
+    // todo
+    // Init Timeout
+    // Init Contract Address
+    config.address = testMetaData.contractAddress;
+  });
 
-    let replaceLast = (find, replace, string) => {
-        var lastIndex = string.lastIndexOf(find);
+  const replaceLast = (find, replace, string) => {
+    const lastIndex = string.lastIndexOf(find);
 
-        if (lastIndex === -1) {
-            return string;
-        }
-
-        var beginString = string.substring(0, lastIndex);
-        var endString = string.substring(lastIndex + find.length);
-
-        return beginString + replace + endString;
+    if (lastIndex === -1) {
+      return string;
     }
 
-    let getItWithTimeout = (name, func) => {
-        it(name, func).timeout(testMetaData.REQUEST_TIMEOUT);
-    }
+    const beginString = string.substring(0, lastIndex);
+    const endString = string.substring(lastIndex + find.length);
 
-    let getResult = async (route, status, query) => {
-        let res = await chai.request(server)
-            .get(MAIN_ROUTE + routes.isConnected)
-            .query(query)
-        expect(res).to.have.status(status)
-        return res;
-    }
+    return beginString + replace + endString;
+  };
 
-    let isResExpected = (res, object) => {
-        expect(res.body.message).to.equal(object);
-    }
+  const getItWithTimeout = (name, func) => {
+    it(name, func).timeout(testMetaData.REQUEST_TIMEOUT);
+  };
 
-    let isResObject = (res) => {
-        expect(res.body).to.be.an('object');
-    }
+  const getResult = async (route, status, query) => {
+    const res = await chai.request(server)
+      .get(MAIN_ROUTE + routes.isConnected)
+      .query(query);
+    expect(res).to.have.status(status);
+    return res;
+  };
 
-    let isResSuccess = (res) => isResExpected(res, testMetaData.SUCCESS_STATUS)
+  const isResExpected = (res, object) => {
+    expect(res.body.message).to.equal(object);
+  };
 
-    let getQuery = (userAddress, phrase, providerAddress, planIndex) => {
-        return {userAddress, phrase, providerAddress, planIndex}
-    }
+  const isResObject = (res) => {
+    expect(res.body).to.be.an('object');
+  };
+
+  const isResSuccess = (res) => isResExpected(res, testMetaData.SUCCESS_STATUS);
+
+  const getQuery = (userAddress, phrase, providerAddress, planIndex) => ({
+    userAddress, phrase, providerAddress, planIndex,
+  });
 
     getItWithTimeout('should be Connected', async () => {
         await getResult(routes.isConnected, responseCodes.success)
@@ -199,15 +199,15 @@ describe('Getting Data Test', () => {
         })
     })
 
-    describe('Check Getting Plan Data Funcs', () => {
-        let planDataWithIndex0 = {
-            "duration": "20,000,000",
-            "active_session_limit": "1",
-            "price": "1,000",
-            "max_refund_permille_policy": "100",
-            "disabled": false
-        }
-        let planCharacteristicWithIndex0 = '';
+  describe('Check Getting Plan Data Funcs', () => {
+    const planDataWithIndex0 = {
+      duration: '20,000,000',
+      active_session_limit: '1',
+      price: '1,000',
+      max_refund_permille_policy: '100',
+      disabled: false,
+    };
+    const planCharacteristicWithIndex0 = '';
 
         getItWithTimeout('should Get Plan Data', async () => {
             let route = replaceLast(paramsNames.providerAddress, userAddress, routes.getPlanData)
