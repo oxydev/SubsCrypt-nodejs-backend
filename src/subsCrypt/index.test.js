@@ -26,6 +26,15 @@ describe('Errors - IT', () => {
 const {testMetaData, config} = require('@oxydev/subscrypt')
 const {routes} = require('./router')
 
+const paramsNames = {
+    userAddress: 'address',
+    username: 'username',
+    providerAddress: 'providerAddress',
+    planIndex: 'planIndex'
+}
+const responseCodes = {
+    success: 200
+}
 describe('Getting Data Test', () => {
     let userWholeData;
 
@@ -76,22 +85,22 @@ describe('Getting Data Test', () => {
     }
 
     getItWithTimeout('should be Connected', async () => {
-        await getResult(routes.isConnected, 200)
+        await getResult(routes.isConnected, responseCodes.success)
     })
 
     describe('Check UserName And UserAddress Validity', () => {
         getItWithTimeout('should User Be Available', async (done) => {
-            let route = replaceLast('username', username, routes.isUsernameAvailable)
+            let route = replaceLast(paramsNames.username, username, routes.isUsernameAvailable)
             let query = {}
-            let result = await getResult(route, 200, query)
+            let result = await getResult(route, responseCodes.success, query)
             isResSuccess(result)
             done();
         });
 
         getItWithTimeout('should The Address Be For The User', async (done) => {
-            let route = replaceLast('address', username, routes.getUsername)
+            let route = replaceLast(paramsNames.userAddress, username, routes.getUsername)
             let query = {}
-            let result = await getResult(route, 200, query)
+            let result = await getResult(route, responseCodes.success, query)
             isResSuccess(result)
             isResExpected(result, username)
             done();
@@ -101,16 +110,16 @@ describe('Getting Data Test', () => {
     describe('Check User Authentication', (done) => {
         getItWithTimeout('should Authenticate User Address With Password', async () => {
             let query = getQuery(testMetaData.userAddress, testMetaData.passWord)
-            let result = await getResult(routes.userCheckAuth, 200, query)
+            let result = await getResult(routes.userCheckAuth, responseCodes.success, query)
             isResObject(result)
             isResSuccess(result)
             done();
         })
 
         getItWithTimeout('should Authenticate Username With Password', async () => {
-            let newUrl = replaceLast('username', testMetaData.username, routes.userCheckAuthWithUsername)
+            let newUrl = replaceLast(paramsNames.username, testMetaData.username, routes.userCheckAuthWithUsername)
             let query = getQuery(null, passWord)
-            let result = await getResult(newUrl, 200, query)
+            let result = await getResult(newUrl, responseCodes.success, query)
             isResObject(result)
             isResSuccess(result)
             done();
@@ -120,16 +129,16 @@ describe('Getting Data Test', () => {
     describe('Check Getting The Data Of The User', (done) => {
         getItWithTimeout('should Retrieve Whole Data', async () => {
             let query = getQuery(testMetaData.username, testMetaData.passWord)
-            let result = await getResult(routes.retrieveWholeDataWithUsername, 200, query)
+            let result = await getResult(routes.retrieveWholeDataWithUsername, responseCodes.success, query)
             isResObject(result)
             userWholeData = result.body.message;
             done();
         })
 
         getItWithTimeout('should Retrieve Data', async () => {
-            let route = replaceLast('providerAddress', userWholeData[0].provider, routes.retrieveDataWithUsername)
+            let route = replaceLast(paramsNames.providerAddress, userWholeData[0].provider, routes.retrieveDataWithUsername)
             let query = getQuery(testMetaData.username, testMetaData.passWord)
-            let result = await getResult(route, 200, query)
+            let result = await getResult(route, responseCodes.success, query)
             let expectedResult = userWholeData.filter(value => value.provider === userWholeData[0].provider)
             isResObject(result)
             isResExpected(result, expectedResult)
@@ -140,7 +149,7 @@ describe('Getting Data Test', () => {
         getItWithTimeout('should CheckAuth Using User Address', async () => {
             for (let userWholeDatum of userWholeData) {
                 let query = getQuery(userAddress, passWord, userWholeDatum.provider)
-                let result = getResult(routes.checkAuth, 200, query)
+                let result = getResult(routes.checkAuth, responseCodes.success, query)
                 isResObject(result)
                 isResSuccess(result)
             }
@@ -148,9 +157,9 @@ describe('Getting Data Test', () => {
 
         getItWithTimeout('should CheckAuth Using User Name', async () => {
             for (let userWholeDatum of userWholeData) {
-                let route = replaceLast('username', username, routes.userCheckAuthWithUsername)
+                let route = replaceLast(paramsNames.username, username, routes.userCheckAuthWithUsername)
                 let query = getQuery(null, passWord, userWholeDatum.provider)
-                let result = await getResult(route, 200, query)
+                let result = await getResult(route, responseCodes.success, query)
                 isResSuccess(result)
             }
         })
@@ -159,14 +168,14 @@ describe('Getting Data Test', () => {
     describe('Check Auth Of Provider', () => {
         getItWithTimeout('should CheckAuth Using Provider Address', async () => {
             let query = getQuery(null, passWord, userAddress)
-            let result = await getResult(routes.providerCheckAuth, 200, query)
+            let result = await getResult(routes.providerCheckAuth, responseCodes.success, query)
             isResSuccess(result)
         })
 
         getItWithTimeout('should CheckAuth Using Provider Username', async function () {
-            let route = replaceLast('username', username, routes.providerCheckAuthWithUsername)
+            let route = replaceLast(paramsNames.username, username, routes.providerCheckAuthWithUsername)
             let query = getQuery(null, passWord, null)
-            let result = await getResult(route, 200, query)
+            let result = await getResult(route, responseCodes.success, query)
             isResSuccess(result)
         })
     })
@@ -175,16 +184,16 @@ describe('Getting Data Test', () => {
         getItWithTimeout('should Check Subscriptions With User Address', async () => {
             for (let [index, userWholeDatum] of userWholeData.entries()) {
                 let query = getQuery(userAddress, null, userWholeDatum.provider, index)
-                let result = await getResult(routes.checkSubscription, 200, query)
+                let result = await getResult(routes.checkSubscription, responseCodes.success, query)
                 isResSuccess(result)
             }
         })
 
         getItWithTimeout('should Check Subscriptions With User Name', async () => {
             for (let [index, userWholeDatum] of userWholeData.entries()) {
-                let route = replaceLast('username', username, routes.checkSubscriptionWithUsername)
+                let route = replaceLast(paramsNames.username, username, routes.checkSubscriptionWithUsername)
                 let query = getQuery(null, null, userWholeDatum.provider, index)
-                let result = await getResult(route, 200, query)
+                let result = await getResult(route, responseCodes.success, query)
                 isResSuccess(result)
             }
         })
@@ -201,19 +210,19 @@ describe('Getting Data Test', () => {
         let planCharacteristicWithIndex0 = '';
 
         getItWithTimeout('should Get Plan Data', async () => {
-            let route = replaceLast('providerAddress', userAddress, routes.getPlanData)
-            route = replaceLast('0', 'planIndex', route)
+            let route = replaceLast(paramsNames.providerAddress, userAddress, routes.getPlanData)
+            route = replaceLast(paramsNames.planIndex, '0', route)
             let query = {}
-            let result = await getResult(route, 200, query)
+            let result = await getResult(route, responseCodes.success, query)
             isResSuccess(result)
             isResExpected(result, planDataWithIndex0)
         })
 
         getItWithTimeout('should Get Plan Characteristic', async () => {
-            let route = replaceLast('providerAddress', userAddress, routes.getPlanCharacteristics)
-            route = replaceLast('0', 'planIndex', route)
+            let route = replaceLast(paramsNames.providerAddress, userAddress, routes.getPlanCharacteristics)
+            route = replaceLast(paramsNames.planIndex, '0', route)
             let query = {}
-            let result = await getResult(route, 200, query)
+            let result = await getResult(route, responseCodes.success, query)
             isResSuccess(result)
             isResExpected(result, planCharacteristicWithIndex0)
             assert.deepEqual(result.result, planCharacteristicWithIndex0)
