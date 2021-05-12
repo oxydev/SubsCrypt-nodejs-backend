@@ -81,8 +81,8 @@ describe('Getting Data Test', () => {
     expect(res.body.message).to.equal(testMetaData.SUCCESS_STATUS);
   };
 
-  const getQuery = (username, userAddress, phrase, providerAddress, planIndex) => ({
-    username, userAddress, phrase, providerAddress, planIndex,
+  const getQuery = ({username=null, userAddress=null, password=null, providerAddress=null, planIndex=null}) => ({
+    username, userAddress, phrase: password, providerAddress, planIndex,
   });
 
   getItWithTimeout('should be Connected', async () => {
@@ -109,14 +109,14 @@ describe('Getting Data Test', () => {
 
   describe('Check User Authentication', () => {
     getItWithTimeout('should Authenticate User Address With Password', async () => {
-      const query = getQuery(null, testMetaData.userAddress, testMetaData.passWord);
+      const query = getQuery({userAddress: testMetaData.userAddress, password: testMetaData.passWord});
       const result = await getResult(routes.userCheckAuth, responseCodes.success, query);
       isResExpected(result, true);
     });
 
     getItWithTimeout('should Authenticate Username With Password', async () => {
       const newUrl = replaceLast(paramsNames.username, testMetaData.username, routes.userCheckAuthWithUsername);
-      const query = getQuery(null, null, testMetaData.passWord);
+      const query = getQuery({password: testMetaData.passWord});
       const result = await getResult(newUrl, responseCodes.success, query);
       isResExpected(result, true);
     });
@@ -124,14 +124,14 @@ describe('Getting Data Test', () => {
 
   describe('Check Getting The Data Of The User', () => {
     getItWithTimeout('should Retrieve Whole Data', async () => {
-      const query = getQuery(testMetaData.username, null, testMetaData.passWord);
+      const query = getQuery({username: testMetaData.username, password: testMetaData.passWord});
       const result = await getResult(routes.retrieveWholeDataWithUsername, responseCodes.success, query);
       userWholeData = result.body;
     });
 
     getItWithTimeout('should Retrieve Data', async () => {
       const route = replaceLast(paramsNames.providerAddress, userWholeData[0].provider, routes.retrieveDataWithUsername);
-      const query = getQuery(testMetaData.username, null, testMetaData.passWord);
+      const query = getQuery({username: testMetaData.username, password: testMetaData.passWord});
       const result = await getResult(route, responseCodes.success, query);
       const expectedResult = userWholeData.filter((value) => value.provider === userWholeData[0].provider);
       isResExpected(result, expectedResult);
@@ -141,7 +141,7 @@ describe('Getting Data Test', () => {
   describe('Check Checking Auth Of User & Its Providers', () => {
     getItWithTimeout('should CheckAuth Using User Address', async () => {
       for (const userWholeDatum of userWholeData) {
-        const query = getQuery(null, testMetaData.userAddress, testMetaData.passWord, userWholeDatum.provider);
+        const query = getQuery({userAddress: testMetaData.userAddress, password: testMetaData.passWord, providerAddress: userWholeDatum.provider});
         const result = await getResult(routes.checkAuth, responseCodes.success, query);
         isResExpected(result, true);
       }
@@ -150,7 +150,7 @@ describe('Getting Data Test', () => {
     getItWithTimeout('should CheckAuth Using User Name', async () => {
       for (const userWholeDatum of userWholeData) {
         const route = replaceLast(paramsNames.username, testMetaData.username, routes.userCheckAuthWithUsername);
-        const query = getQuery(null, null, testMetaData.passWord, userWholeDatum.provider);
+        const query = getQuery({password: testMetaData.passWord, providerAddress: userWholeDatum.provider});
         const result = await getResult(route, responseCodes.success, query);
         isResExpected(result, true);
       }
@@ -159,14 +159,14 @@ describe('Getting Data Test', () => {
 
   describe('Check Auth Of Provider', () => {
     getItWithTimeout('should CheckAuth Using Provider Address', async () => {
-      const query = getQuery(null, null, testMetaData.passWord, testMetaData.providerAddress);
+      const query = getQuery({password: testMetaData.passWord, providerAddress: testMetaData.providerAddress});
       const result = await getResult(routes.providerCheckAuth, responseCodes.success, query);
       isResExpected(result, true)
     });
 
     getItWithTimeout('should CheckAuth Using Provider Username', async () => {
       const route = replaceLast(paramsNames.username, testMetaData.providerName, routes.providerCheckAuthWithUsername);
-      const query = getQuery(null, null, testMetaData.passWord, null);
+      const query = getQuery({password: testMetaData.passWord});
       const result = await getResult(route, responseCodes.success, query);
       isResExpected(result, true)
     });
@@ -175,7 +175,7 @@ describe('Getting Data Test', () => {
   describe('Check Subscription Functions', () => {
     getItWithTimeout('should Check Subscriptions With User Address', async () => {
       for (const [index, userWholeDatum] of userWholeData.entries()) {
-        const query = getQuery(null, testMetaData.userAddress, null, userWholeDatum.provider, index);
+        const query = getQuery({userAddress: testMetaData.userAddress, providerAddress: userWholeDatum.provider, planIndex: index});
         const result = await getResult(routes.checkSubscription, responseCodes.success, query);
         isResExpected(result, false)
       }
@@ -184,7 +184,7 @@ describe('Getting Data Test', () => {
     getItWithTimeout('should Check Subscriptions With User Name', async () => {
       for (const [index, userWholeDatum] of userWholeData.entries()) {
         const route = replaceLast(paramsNames.username, testMetaData.username, routes.checkSubscriptionWithUsername);
-        const query = getQuery(null, null, null, userWholeDatum.provider, index);
+        const query = getQuery({providerAddress: userWholeDatum.provider, planIndex: index});
         const result = await getResult(route, responseCodes.success, query);
         isResExpected(result, false)
       }
