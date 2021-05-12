@@ -126,7 +126,6 @@ describe('Getting Data Test', () => {
     getItWithTimeout('should Retrieve Whole Data', async () => {
       const query = getQuery(testMetaData.username, null, testMetaData.passWord);
       const result = await getResult(routes.retrieveWholeDataWithUsername, responseCodes.success, query);
-
       userWholeData = result.body;
     });
 
@@ -153,72 +152,60 @@ describe('Getting Data Test', () => {
         const route = replaceLast(paramsNames.username, testMetaData.username, routes.userCheckAuthWithUsername);
         const query = getQuery(null, null, testMetaData.passWord, userWholeDatum.provider);
         const result = await getResult(route, responseCodes.success, query);
-        isResSuccess(result);
+        isResExpected(result, true);
       }
     });
   });
 
   describe('Check Auth Of Provider', () => {
     getItWithTimeout('should CheckAuth Using Provider Address', async () => {
-      const query = getQuery(null, passWord, userAddress);
+      const query = getQuery(null, null, testMetaData.passWord, testMetaData.providerAddress);
       const result = await getResult(routes.providerCheckAuth, responseCodes.success, query);
-      isResSuccess(result);
+      isResExpected(result, true)
     });
 
     getItWithTimeout('should CheckAuth Using Provider Username', async () => {
-      const route = replaceLast(paramsNames.username, username, routes.providerCheckAuthWithUsername);
-      const query = getQuery(null, passWord, null);
+      const route = replaceLast(paramsNames.username, testMetaData.providerName, routes.providerCheckAuthWithUsername);
+      const query = getQuery(null, null, testMetaData.passWord, null);
       const result = await getResult(route, responseCodes.success, query);
-      isResSuccess(result);
+      isResExpected(result, true)
     });
   });
 
   describe('Check Subscription Functions', () => {
     getItWithTimeout('should Check Subscriptions With User Address', async () => {
       for (const [index, userWholeDatum] of userWholeData.entries()) {
-        const query = getQuery(userAddress, null, userWholeDatum.provider, index);
+        const query = getQuery(null, testMetaData.userAddress, null, userWholeDatum.provider, index);
         const result = await getResult(routes.checkSubscription, responseCodes.success, query);
-        isResSuccess(result);
+        isResExpected(result, false)
       }
     });
 
     getItWithTimeout('should Check Subscriptions With User Name', async () => {
       for (const [index, userWholeDatum] of userWholeData.entries()) {
-        const route = replaceLast(paramsNames.username, username, routes.checkSubscriptionWithUsername);
-        const query = getQuery(null, null, userWholeDatum.provider, index);
+        const route = replaceLast(paramsNames.username, testMetaData.username, routes.checkSubscriptionWithUsername);
+        const query = getQuery(null, null, null, userWholeDatum.provider, index);
         const result = await getResult(route, responseCodes.success, query);
-        isResSuccess(result);
+        isResExpected(result, false)
       }
     });
   });
 
   describe('Check Getting Plan Data Funcs', () => {
-    const planDataWithIndex0 = {
-      duration: '20,000,000',
-      active_session_limit: '1',
-      price: '1,000',
-      max_refund_permille_policy: '100',
-      disabled: false,
-    };
-    const planCharacteristicWithIndex0 = '';
-
     getItWithTimeout('should Get Plan Data', async () => {
-      let route = replaceLast(paramsNames.providerAddress, userAddress, routes.getPlanData);
+      let route = replaceLast(paramsNames.providerAddress, testMetaData.providerAddress, routes.getPlanData);
       route = replaceLast(paramsNames.planIndex, '0', route);
       const query = {};
       const result = await getResult(route, responseCodes.success, query);
-      isResSuccess(result);
-      isResExpected(result, planDataWithIndex0);
+      isResExpected(result, testMetaData.planDataWithIndex0);
     });
 
     getItWithTimeout('should Get Plan Characteristic', async () => {
-      let route = replaceLast(paramsNames.providerAddress, userAddress, routes.getPlanCharacteristics);
+      let route = replaceLast(paramsNames.providerAddress, testMetaData.providerAddress, routes.getPlanCharacteristics);
       route = replaceLast(paramsNames.planIndex, '0', route);
       const query = {};
       const result = await getResult(route, responseCodes.success, query);
-      isResSuccess(result);
-      isResExpected(result, planCharacteristicWithIndex0);
-      assert.deepEqual(result.result, planCharacteristicWithIndex0);
+      isResExpected(result, testMetaData.planCharacteristicWithIndex0);
     });
   });
 });
