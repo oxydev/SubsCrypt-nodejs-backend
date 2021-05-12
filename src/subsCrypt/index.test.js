@@ -45,6 +45,10 @@ describe('Getting Data Test', () => {
     config.address = testMetaData.contractAddress;
   });
 
+  const isFunction = (functionToCheck) => {
+    return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+  }
+
   const replaceLast = (find, replace, string) => {
     const lastIndex = string.lastIndexOf(find);
     if (lastIndex === -1) {
@@ -85,6 +89,45 @@ describe('Getting Data Test', () => {
     username, userAddress, phrase: password, providerAddress, planIndex,
   });
 
+  const routeWithParams = (route, params) => {
+
+    if (params) {
+      Object.keys(params).forEach((value, index, array) => {
+        route = replaceLast(paramsNames[value], params[value], route)
+      })
+    }
+    return route;
+  }
+  const getItFunc = async (routeName, itObject) => {
+
+    const route = routeWithParams(routes[routeName], itObject.params)
+    const query = getQuery(itObject.query)
+    const result = await getResult(route, itObject.responseCode, query);
+    if (itObject.testIsObj) {
+      isResObject(result)
+    }
+    if (itObject.testIsSuccess) {
+      isResSuccess(result)
+    }
+    const expect = itObject.expectedResult;
+    if (expect !== undefined) {
+      isResExpected(result, isFunction(expect) ? expect() : expect)
+    }
+    if (isFunction(itObject.after)) {
+      itObject.after()
+    }
+  }
+  const getTests = (testsObj) => {
+
+    Object.keys(testsObj).forEach((describeTest) => {
+      describe('Check ' + describeTest, () => {
+        Object.keys(testsObj[describeTest]).forEach((itTest) => {
+          getItWithTimeout(itTest + ' Test', getItFunc(itTest, testsObj[describeTest][itTest]))
+        })
+      })
+    })
+  }
+
   getItWithTimeout('should be Connected', async () => {
     await getResult(routes.isConnected, responseCodes.success);
   });
@@ -106,6 +149,7 @@ describe('Getting Data Test', () => {
     //   done();
     // });
   });
+
 
   describe('Check User Authentication', () => {
     getItWithTimeout('should Authenticate User Address With Password', async () => {
