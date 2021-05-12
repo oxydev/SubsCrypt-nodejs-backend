@@ -99,10 +99,10 @@ describe('Getting Data Test', () => {
     return route;
   }
   const getItFunc = async (routeName, itObject) => {
-
     const route = routeWithParams(routes[routeName], itObject.params)
-    const query = getQuery(itObject.query)
-    const result = await getResult(route, itObject.responseCode, query);
+    const query = getQuery(itObject.query || {})
+    const result = await getResult(route, itObject.responseCode || responseCodes.success, query);
+
     if (itObject.testIsObj) {
       isResObject(result)
     }
@@ -118,27 +118,62 @@ describe('Getting Data Test', () => {
     }
   }
   const getTests = (testsObj) => {
-
     Object.keys(testsObj).forEach((describeTest) => {
       describe('Check ' + describeTest, () => {
         Object.keys(testsObj[describeTest]).forEach((itTest) => {
-          getItWithTimeout(itTest + ' Test', getItFunc(itTest, testsObj[describeTest][itTest]))
+          getItWithTimeout(itTest + ' Test', () => getItFunc(itTest, testsObj[describeTest][itTest]))
         })
       })
     })
   }
 
-  getItWithTimeout('should be Connected', async () => {
-    await getResult(routes.isConnected, responseCodes.success);
-  });
+  const testsObj = {
+    'is Connected': {
+      'isConnected': {}
+    },
+    'Username And UserAddress Validity': {
+      'isUsernameAvailable': {
+        params: {
+          username: testMetaData.username
+        },
+        expectedResult: false
+      },
+      'getUsername': {
+        params: {
+          userAddress: testMetaData.userAddress
+        },
+        testIsObj: true,
+        expectedResult: testMetaData.username
+      }
+    },
+    'User Authentication': {
+      'userCheckAuth': {
+        query: {userAddress: testMetaData.userAddress, password: testMetaData.passWord},
+        expectedResult: true
+      },
+      'userCheckAuthWithUsername': {
+        params: {
+          username: testMetaData.username
+        },
+        query: {password: testMetaData.passWord},
+        expectedResult: true
+      }
+    }
+  }
 
-  describe('Check UserName And UserAddress Validity', () => {
-    getItWithTimeout('should User Be Available', async () => {
-      const route = replaceLast(paramsNames.username, testMetaData.username, routes.isUsernameAvailable);
-      const query = {};
-      const result = await getResult(route, responseCodes.success, query);
-      isResExpected(result, false);
-    });
+  getTests(testsObj)
+
+  // getItWithTimeout('should be Connected', async () => {
+  //   await getResult(routes.isConnected, responseCodes.success);
+  // });
+  //
+  // describe('Check UserName And UserAddress Validity', () => {
+  //   getItWithTimeout('should User Be Available', async () => {
+  //     const route = replaceLast(paramsNames.username, testMetaData.username, routes.isUsernameAvailable);
+  //     const query = {};
+  //     const result = await getResult(route, responseCodes.success, query);
+  //     isResExpected(result, false);
+  //   });
 
     // getItWithTimeout('should The Address Be For The User', async (done) => {
     //   const route = replaceLast(paramsNames.userAddress, testMetaData.username, routes.getUsername);
@@ -148,23 +183,23 @@ describe('Getting Data Test', () => {
     //   isResExpected(result, testMetaData.username);
     //   done();
     // });
-  });
+  // });
 
 
-  describe('Check User Authentication', () => {
-    getItWithTimeout('should Authenticate User Address With Password', async () => {
-      const query = getQuery({userAddress: testMetaData.userAddress, password: testMetaData.passWord});
-      const result = await getResult(routes.userCheckAuth, responseCodes.success, query);
-      isResExpected(result, true);
-    });
-
-    getItWithTimeout('should Authenticate Username With Password', async () => {
-      const newUrl = replaceLast(paramsNames.username, testMetaData.username, routes.userCheckAuthWithUsername);
-      const query = getQuery({password: testMetaData.passWord});
-      const result = await getResult(newUrl, responseCodes.success, query);
-      isResExpected(result, true);
-    });
-  });
+  // describe('Check User Authentication', () => {
+  //   getItWithTimeout('should Authenticate User Address With Password', async () => {
+  //     const query = getQuery({userAddress: testMetaData.userAddress, password: testMetaData.passWord});
+  //     const result = await getResult(routes.userCheckAuth, responseCodes.success, query);
+  //     isResExpected(result, true);
+  //   });
+  //
+  //   getItWithTimeout('should Authenticate Username With Password', async () => {
+  //     const newUrl = replaceLast(paramsNames.username, testMetaData.username, routes.userCheckAuthWithUsername);
+  //     const query = getQuery({password: testMetaData.passWord});
+  //     const result = await getResult(newUrl, responseCodes.success, query);
+  //     isResExpected(result, true);
+  //   });
+  // });
 
   describe('Check Getting The Data Of The User', () => {
     getItWithTimeout('should Retrieve Whole Data', async () => {
