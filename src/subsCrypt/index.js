@@ -106,7 +106,6 @@ async function retrieveWholeDataWithUsername(req, res, next) {
     await subscrypt.retrieveWholeDataWithUsername(req.query.username, req.query.phrase)
       .then((resp) => {
         const arr = refactorRes(resp);
-        console.log(arr[1]);
         res.status(arr[0]).json(arr[1]);
       }).catch(() => {
         next(errors.newHttpError(404, 'Wrong Args'));
