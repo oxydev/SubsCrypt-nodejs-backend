@@ -93,7 +93,7 @@ describe('Getting Data Test', () => {
 
     if (params) {
       Object.keys(params).forEach((value, index, array) => {
-        route = replaceLast(paramsNames[value], params[value], route)
+        route = replaceLast(paramsNames[value], isFunction(params[value]) ? params[value]() : params[value], route)
       })
     }
     return route;
@@ -114,7 +114,7 @@ describe('Getting Data Test', () => {
       isResExpected(result, isFunction(expect) ? expect() : expect)
     }
     if (isFunction(itObject.after)) {
-      itObject.after()
+      itObject.after(result)
     }
   }
   const getTests = (testsObj) => {
@@ -158,64 +158,54 @@ describe('Getting Data Test', () => {
         query: {password: testMetaData.passWord},
         expectedResult: true
       }
-    }
+    },
+    'Getting The Data Of The User': {
+      'retrieveWholeDataWithUsername': {
+        query: {username: testMetaData.username, password: testMetaData.passWord},
+        after: (result) => {
+          userWholeData = result.body;
+        }
+      },
+      'retrieveDataWithUsername': {
+        params: {
+          providerAddress: () => userWholeData[0].provider
+        },
+        query: {username: testMetaData.username, password: testMetaData.passWord},
+        expectedResult: () => userWholeData.filter((value) => value.provider === userWholeData[0].provider)
+      }
+    },
+    'Auth Of Provider': {
+      'providerCheckAuth': {
+        query: {password: testMetaData.passWord, providerAddress: testMetaData.providerAddress},
+        expectedResult: true
+      },
+      'providerCheckAuthWithUsername': {
+        params: {
+          username: testMetaData.providerName
+        },
+        query: {password: testMetaData.passWord},
+        expectedResult: true
+      }
+    },
+    'Getting Plan Data Funcs': {
+      'getPlanData': {
+        params: {
+          providerAddress: testMetaData.providerAddress,
+          planIndex: '0'
+        },
+        expectedResult: testMetaData.planDataWithIndex0
+      },
+      'getPlanCharacteristics': {
+        params: {
+          providerAddress: testMetaData.providerAddress,
+          planIndex: '0'
+        },
+        expectedResult: testMetaData.planCharacteristicWithIndex0
+      }
+    },
   }
 
   getTests(testsObj)
-
-  // getItWithTimeout('should be Connected', async () => {
-  //   await getResult(routes.isConnected, responseCodes.success);
-  // });
-  //
-  // describe('Check UserName And UserAddress Validity', () => {
-  //   getItWithTimeout('should User Be Available', async () => {
-  //     const route = replaceLast(paramsNames.username, testMetaData.username, routes.isUsernameAvailable);
-  //     const query = {};
-  //     const result = await getResult(route, responseCodes.success, query);
-  //     isResExpected(result, false);
-  //   });
-
-    // getItWithTimeout('should The Address Be For The User', async (done) => {
-    //   const route = replaceLast(paramsNames.userAddress, testMetaData.username, routes.getUsername);
-    //   const query = {};
-    //   const result = await getResult(route, responseCodes.success, query);
-    //   isResObject(result);
-    //   isResExpected(result, testMetaData.username);
-    //   done();
-    // });
-  // });
-
-
-  // describe('Check User Authentication', () => {
-  //   getItWithTimeout('should Authenticate User Address With Password', async () => {
-  //     const query = getQuery({userAddress: testMetaData.userAddress, password: testMetaData.passWord});
-  //     const result = await getResult(routes.userCheckAuth, responseCodes.success, query);
-  //     isResExpected(result, true);
-  //   });
-  //
-  //   getItWithTimeout('should Authenticate Username With Password', async () => {
-  //     const newUrl = replaceLast(paramsNames.username, testMetaData.username, routes.userCheckAuthWithUsername);
-  //     const query = getQuery({password: testMetaData.passWord});
-  //     const result = await getResult(newUrl, responseCodes.success, query);
-  //     isResExpected(result, true);
-  //   });
-  // });
-
-  describe('Check Getting The Data Of The User', () => {
-    getItWithTimeout('should Retrieve Whole Data', async () => {
-      const query = getQuery({username: testMetaData.username, password: testMetaData.passWord});
-      const result = await getResult(routes.retrieveWholeDataWithUsername, responseCodes.success, query);
-      userWholeData = result.body;
-    });
-
-    getItWithTimeout('should Retrieve Data', async () => {
-      const route = replaceLast(paramsNames.providerAddress, userWholeData[0].provider, routes.retrieveDataWithUsername);
-      const query = getQuery({username: testMetaData.username, password: testMetaData.passWord});
-      const result = await getResult(route, responseCodes.success, query);
-      const expectedResult = userWholeData.filter((value) => value.provider === userWholeData[0].provider);
-      isResExpected(result, expectedResult);
-    });
-  });
 
   describe('Check Checking Auth Of User & Its Providers', () => {
     getItWithTimeout('should CheckAuth Using User Address', async () => {
@@ -233,21 +223,6 @@ describe('Getting Data Test', () => {
         const result = await getResult(route, responseCodes.success, query);
         isResExpected(result, true);
       }
-    });
-  });
-
-  describe('Check Auth Of Provider', () => {
-    getItWithTimeout('should CheckAuth Using Provider Address', async () => {
-      const query = getQuery({password: testMetaData.passWord, providerAddress: testMetaData.providerAddress});
-      const result = await getResult(routes.providerCheckAuth, responseCodes.success, query);
-      isResExpected(result, true)
-    });
-
-    getItWithTimeout('should CheckAuth Using Provider Username', async () => {
-      const route = replaceLast(paramsNames.username, testMetaData.providerName, routes.providerCheckAuthWithUsername);
-      const query = getQuery({password: testMetaData.passWord});
-      const result = await getResult(route, responseCodes.success, query);
-      isResExpected(result, true)
     });
   });
 
@@ -270,21 +245,4 @@ describe('Getting Data Test', () => {
     });
   });
 
-  describe('Check Getting Plan Data Funcs', () => {
-    getItWithTimeout('should Get Plan Data', async () => {
-      let route = replaceLast(paramsNames.providerAddress, testMetaData.providerAddress, routes.getPlanData);
-      route = replaceLast(paramsNames.planIndex, '0', route);
-      const query = {};
-      const result = await getResult(route, responseCodes.success, query);
-      isResExpected(result, testMetaData.planDataWithIndex0);
-    });
-
-    getItWithTimeout('should Get Plan Characteristic', async () => {
-      let route = replaceLast(paramsNames.providerAddress, testMetaData.providerAddress, routes.getPlanCharacteristics);
-      route = replaceLast(paramsNames.planIndex, '0', route);
-      const query = {};
-      const result = await getResult(route, responseCodes.success, query);
-      isResExpected(result, testMetaData.planCharacteristicWithIndex0);
-    });
-  });
 });
