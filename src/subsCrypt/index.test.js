@@ -130,16 +130,25 @@ describe('Getting Data Test', () => {
     'is Connected': {
       isConnected: {},
     },
+    'provider name And providerAddress Validity': {
+      isUsernameAvailable: {
+        params: {
+          username: testMetaData.providerName,
+        },
+        expectedResult: false,
+      },
+      getUsername: {
+        params: {
+          userAddress: testMetaData.providerAddress,
+        },
+        testIsObj: true,
+        expectedResult: testMetaData.providerName,
+      },
+    },
     'Username And UserAddress Validity': {
       isUsernameAvailable: {
         params: {
           username: testMetaData.username,
-        },
-        expectedResult: false,
-      },
-      isUsernameAvailable: {
-        params: {
-          username: testMetaData.providerName,
         },
         expectedResult: false,
       },
@@ -149,13 +158,6 @@ describe('Getting Data Test', () => {
         },
         testIsObj: true,
         expectedResult: testMetaData.username,
-      },
-      getUsername: {
-        params: {
-          userAddress: testMetaData.providerAddress,
-        },
-        testIsObj: true,
-        expectedResult: testMetaData.providerName,
       },
     },
     'User Authentication': {
