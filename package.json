@@ -16,7 +16,7 @@
     "config": "^3.3.6",
     "express": "4.17.1",
     "morgan": "1.10.0",
-    "@oxydev/subscrypt": "oxydev/SubsCrypt-npm-library#issue-12",
+    "@oxydev/subscrypt": "^0.0.8",
     "swagger-jsdoc": "^7.0.0-rc.6",
     "winston": "^3.3.3",
     "swagger-ui-express": "^4.1.6",
