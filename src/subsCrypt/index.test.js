@@ -84,7 +84,7 @@ describe('Getting Data Test', () => {
   };
 
   const isResString = (res, expected) => {
-    expect(res.body.substring[1]).to.equal(expected);
+    expect(res.body.substring(1)).to.equal(expected);
   };
 
   const getQuery = ({
