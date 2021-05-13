@@ -9,7 +9,7 @@ const refactorRes = (response) => {
 
 async function checkSubscription(req, res, next) {
   try {
-    await subscrypt.checkSubscription(req.query.user, req.query.providerAddress,
+    await subscrypt.checkSubscription(req.query.userAddress, req.query.providerAddress,
       req.query.planIndex).then((resp) => {
       const arr = refactorRes(resp);
       if (arr[0] === 200) res.status(arr[0]).json(arr[1]);
@@ -32,7 +32,7 @@ async function isConnected(req, res, next) {
 async function checkSubscriptionWithUsername(req, res, next) {
   try {
     await subscrypt.checkSubscriptionWithUsername(req.params.username,
-      req.query.providerAddress, req.query.phrase)
+      req.query.providerAddress, req.query.planIndex)
       .then((resp) => {
         const arr = refactorRes(resp);
         if (arr[0] === 200) res.status(arr[0]).json(arr[1]);
@@ -130,7 +130,7 @@ async function isUsernameAvailable(req, res, next) {
 
 async function userCheckAuthWithUsername(req, res, next) {
   try {
-    await subscrypt.userCheckAuthWithUsername(req.params.username, req.query.passPhrase)
+    await subscrypt.userCheckAuthWithUsername(req.params.username, req.query.phrase)
       .then((resp) => {
         const arr = refactorRes(resp);
         res.status(arr[0]).json(arr[1]);
@@ -159,7 +159,7 @@ async function providerCheckAuthWithUsername(req, res, next) {
 async function checkAuthWithUsername(req, res, next) {
   try {
     await subscrypt.checkAuthWithUsername(req.params.username, req.query.providerAddress,
-      req.query.passPhrase).then((resp) => {
+      req.query.phrase).then((resp) => {
       const arr = refactorRes(resp);
       res.status(arr[0]).json(arr[1]);
     }).catch(() => {
