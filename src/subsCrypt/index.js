@@ -87,6 +87,19 @@ async function getPlanData(req, res, next) {
   }
 }
 
+async function getPlanLength(req, res, next) {
+  try {
+    await subscrypt.getPlanLength(req.params.providerAddress).then((resp) => {
+      const arr = refactorRes(resp);
+      res.status(arr[0]).json(arr[1]);
+    }).catch(() => {
+      next(errors.newHttpError(404, 'Wrong Args'));
+    });
+  } catch {
+    next(errors.newHttpError(404, 'Wrong Args'));
+  }
+}
+
 async function getPlanCharacteristics(req, res, next) {
   try {
     await subscrypt.getPlanCharacteristics(req.params.providerAddress, req.params.planIndex)
@@ -228,4 +241,5 @@ module.exports = {
   retrieveWholeDataWithUsername,
   getPlanData,
   getPlanCharacteristics,
+  getPlanLength,
 };
