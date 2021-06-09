@@ -10,7 +10,7 @@ const routes = {
   checkSubscriptionWithUsername: '/checkSubscription/:username',
   getUsername: '/getUsername/:address',
   getPlanData: '/getPlanData/:providerAddress/:planIndex',
-  getPlanLength: '/getPlanData/:providerAddress',
+  getPlanLength: '/getPlanLength/:providerAddress',
   isUsernameAvailable: '/isUsernameAvailable/:username',
   userCheckAuthWithUsername: '/userCheckAuth/:username',
   providerCheckAuthWithUsername: '/providerCheckAuth/:username',
