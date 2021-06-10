@@ -1,33 +1,34 @@
 const sqlite3 = require('sqlite3').verbose();
 
-function initDb() {
-  const DBSOURCE = 'db.sqlite';
+const DBSOURCE = 'db.sqlite';
+const db = new sqlite3.Database(DBSOURCE, (err) => {
+  if (err) {
+    throw err;
+  }
+});
 
-  const db = new sqlite3.Database(DBSOURCE, (err) => {
-    if (err) {
-      throw err;
-    } else {
-      db.run('CREATE TABLE "users" ("ID" INTEGER,"user_address" TEXT UNIQUE,PRIMARY KEY("id"))',
-        () => {
-        });
-      db.run('CREATE TABLE "providers" ("ID" INTEGER,"provider_address" TEXT UNIQUE, PRIMARY KEY("ID"))',
-        () => {
-        });
-      db.run('CREATE TABLE "products" ("ID" INTEGER, "provider_id" INTEGER, "plan_index" INTEGER, PRIMARY KEY("ID"),FOREIGN KEY("provider_id") REFERENCES "providers"("ID"))',
-        () => {
-        });
-      db.run('CREATE TABLE _product_user_relationships (user_reference INTEGER, product_reference INTEGER, "finish_time"\tINTEGER)',
-        () => {
-        });
-    }
-  });
+function initDb() {
+  db.run('CREATE TABLE IF NOT EXISTS "users" ("ID" INTEGER,"user_address" TEXT UNIQUE,PRIMARY KEY("id"))',
+    () => {
+    });
+  db.run('CREATE TABLE IF NOT EXISTS "providers" ("ID" INTEGER,"provider_address" TEXT UNIQUE, PRIMARY KEY("ID"))',
+    () => {
+    });
+  db.run('CREATE TABLE IF NOT EXISTS "products" ("ID" INTEGER, "provider_id" INTEGER, "plan_index" INTEGER, PRIMARY KEY("ID"),FOREIGN KEY("provider_id") REFERENCES "providers"("ID"))',
+    () => {
+    });
+  db.run('CREATE TABLE IF NOT EXISTS _product_user_relationships (user_reference INTEGER, product_reference INTEGER, "finish_time"\tINTEGER)',
+    () => {
+    });
 }
 
-let db;
-initDb();
+function addUser(userAddress) {
+  const insert = 'INSERT OR IGNORE INTO users (user_address) VALUES (?)';
+  db.run(insert, [userAddress]);
+}
 
 function addProvider(providerAddress) {
-  const insert = 'INSERT INTO providers (provider_address) VALUES (?)';
+  const insert = 'INSERT OR IGNORE INTO providers (provider_address) VALUES (?)';
   db.run(insert, [providerAddress]);
 }
 
@@ -59,4 +60,4 @@ function getUsersOfPlan(providerAddress, planIndex) {
   db.run(insert, [providerAddress, planIndex]);
 }
 
-module.exports(addProvider, addProduct, addSubscription, getUsers, getUsersOfPlan);
+module.exports(initDb, addProvider, addProduct, addUser, addSubscription, getUsers, getUsersOfPlan);
