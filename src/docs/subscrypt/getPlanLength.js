@@ -1,27 +1,25 @@
 module.exports = {
   get: {
-    tags: ['User Info Getters'],
-    description: 'Returning username of given address',
-    operationId: 'getUsername',
+    tags: ['Provider Info Getters'],
+    description: 'Getting Plan Length of a provider.',
+    operationId: 'getPlanLength',
     parameters: [
       {
-        name: 'address',
+        name: 'providerAddress',
         in: 'path',
         schema: {
           $ref: '#/components/schemas/Address',
         },
         required: true,
-        description: 'Address Of User or provider',
+        description: 'Address Of Provider',
       },
     ],
     responses: {
       200: {
         description: 'Result of request is fetched from blockchain',
         content: {
-          'application/json': {
-            schema: {
-              $ref: '#/components/schemas/Username',
-            },
+          schema: {
+            $ref: '#/components/schemas/Number',
           },
         },
       },

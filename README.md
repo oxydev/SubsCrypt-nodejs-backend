@@ -35,13 +35,12 @@ docker-compose up
 # Building your own image
 For building the image of your code, use this as your `docker-compose.yml` file:
 ```
-ersion: '3.8'
+version: '3.8'
 services:
   node:
     network_mode: host
     build:
       context: ./
-      target: dev
     volumes:
       - .:/usr/src/app
     command: npm run start

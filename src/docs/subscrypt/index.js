@@ -13,6 +13,7 @@ const providerCheckAuthWithUsername = require('./providerCheckAuthWithUsername')
 const userCheckAuth = require('./userCheckAuth');
 const userCheckAuthWithUsername = require('./userCheckAuthWithUsername');
 const getPlanCharacteristics = require('./getPlanCharacteristics');
+const getPlanLength = require('./getPlanLength');
 
 module.exports = {
   paths: {
@@ -60,6 +61,9 @@ module.exports = {
     },
     '/subsCrypt/getPlanCharacteristics/{providerAddress}/{planIndex}': {
       ...getPlanCharacteristics,
+    },
+    '/subsCrypt/getPlanLength/{providerAddress}': {
+      ...getPlanLength,
     },
   },
 };

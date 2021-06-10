@@ -87,6 +87,10 @@ module.exports = {
         description: 'Password of user or provider in contract',
         example: 'someSecurePhrase',
       },
+      Number: {
+        type: 'number',
+        example: '1',
+      },
       Characteristics: {
         type: 'array',
         items: {
