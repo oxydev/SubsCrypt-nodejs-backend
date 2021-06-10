@@ -60,4 +60,12 @@ function getUsersOfPlan(providerAddress, planIndex) {
   db.run(insert, [providerAddress, planIndex]);
 }
 
-module.exports(initDb, addProvider, addProduct, addUser, addSubscription, getUsers, getUsersOfPlan);
+module.exports = {
+  initDb,
+  addUser,
+  addProvider,
+  addProduct,
+  addSubscription,
+  getUsers,
+  getUsersOfPlan,
+};
