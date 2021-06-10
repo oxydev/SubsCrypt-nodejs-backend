@@ -1,4 +1,5 @@
-const sqlite3 = require('sqlite3').verbose();
+const sqlite3 = require('sqlite3')
+  .verbose();
 
 const DBSOURCE = 'db.sqlite';
 const db = new sqlite3.Database(DBSOURCE, (err) => {
@@ -17,7 +18,7 @@ function initDb() {
   db.run('CREATE TABLE IF NOT EXISTS "products" ("ID" INTEGER, "provider_id" INTEGER, "plan_index" INTEGER, PRIMARY KEY("ID"),FOREIGN KEY("provider_id") REFERENCES "providers"("ID"))',
     () => {
     });
-  db.run('CREATE TABLE IF NOT EXISTS _product_user_relationships (user_reference INTEGER, product_reference INTEGER, "finish_time"\tINTEGER)',
+  db.run('CREATE TABLE IF NOT EXISTS _product_user_relationships (user_reference INTEGER, product_reference INTEGER, "finish_time" INTEGER)',
     () => {
     });
 }
@@ -33,31 +34,49 @@ function addProvider(providerAddress) {
 }
 
 function addProduct(providerAddress, planIndex) {
-  const insert = 'INSERT INTO products (provider_id, plan_id) VALUES ((SELECT id from providers WHERE provider_address=?), ?)';
+  const insert = 'INSERT INTO products (provider_id, plan_index) VALUES ((SELECT id from providers WHERE provider_address=?), ?)';
   db.run(insert, [providerAddress, planIndex]);
 }
 
-function addSubscription(userAddress, providerAddress, planIndex) {
-  const insert = 'INSERT INTO _product_user_relationships (user_reference, product_reference) VALUES ((SELECT id from users WHERE user_address=?), (SELECT id from products WHERE product_reference = (SELECT id from providers WHERE provider_address=?) plan_index=?))';
-  db.run(insert, [userAddress, providerAddress, planIndex]);
+function addSubscription(userAddress, providerAddress, planIndex, finishTime) {
+  const insert = 'INSERT INTO _product_user_relationships (user_reference, product_reference, finish_time) VALUES ((SELECT id from users WHERE user_address=?), (SELECT id from products WHERE provider_id = (SELECT id from providers WHERE provider_address=?) and plan_index=?), ?)';
+  db.run(insert, [userAddress, providerAddress, planIndex, finishTime]);
 }
 
-function getUsers(providerAddress) {
-  const insert = 'SELECT user_address from users \n'
-        + 'join _product_user_relationships on users.id = user_reference\n'
-        + 'join products on _product_user_relationships.product_reference = products.ID\n'
-        + 'join providers on provider_id = providers.ID \n'
-        + 'where provider_address = ?';
-  db.run(insert, [providerAddress]);
+function getUsers(providerAddress, res) {
+  const insert = 'SELECT user_address, finish_time, provider_address, plan_index from users \n'
+    + 'join _product_user_relationships on users.id = user_reference\n'
+    + 'join products on _product_user_relationships.product_reference = products.ID\n'
+    + 'join providers on provider_id = providers.ID \n'
+    + 'where provider_address = ?';
+  return db.all(insert, [providerAddress], (err, rows) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: 'success',
+      data: rows,
+    });
+  });
 }
 
-function getUsersOfPlan(providerAddress, planIndex) {
-  const insert = 'SELECT user_address from users \n'
-        + 'join _product_user_relationships on users.id = user_reference\n'
-        + 'join products on _product_user_relationships.product_reference = products.ID\n'
-        + 'join providers on provider_id = providers.ID \n'
-        + 'where provider_address = ? and plan_id = ?';
-  db.run(insert, [providerAddress, planIndex]);
+function getUsersOfPlan(providerAddress, planIndex, res) {
+  const insert = 'SELECT user_address, finish_time, provider_address, plan_index from users \n'
+    + 'join _product_user_relationships on users.id = user_reference\n'
+    + 'join products on _product_user_relationships.product_reference = products.ID\n'
+    + 'join providers on provider_id = providers.ID \n'
+    + 'where provider_address = ? and plan_index = ?';
+  return db.all(insert, [providerAddress, planIndex], (err, rows) => {
+    if (err) {
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    res.json({
+      message: 'success',
+      data: rows,
+    });
+  });
 }
 
 module.exports = {

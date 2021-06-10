@@ -7,4 +7,4 @@ coverage
 /.idea/
 /package-lock.json
 .vscode/launch.json
-db.sqlite
+*.sqlite

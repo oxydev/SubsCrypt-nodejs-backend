@@ -1,5 +1,6 @@
 // Router
-const router = require('express').Router();
+const router = require('express')
+  .Router();
 const tasks = require('./index');
 
 // Tasks
@@ -20,11 +21,18 @@ const routes = {
   retrieveDataWithUsername: '/retrieveDataWithUsername/:providerAddress',
   isConnected: '/isConnected',
   getPlanCharacteristics: '/getPlanCharacteristics/:providerAddress/:planIndex',
+  getUsers: '/getUsers/:providerAddress',
+  getUsersOfPlan: '/getUsers/:providerAddress/:planIndex',
+  addUser: '/addUser/:userAddress', // TODO : remove add to database functions
+  addProvider: '/addProvider/:providerAddress',
+  addProduct: '/addProduct/:providerAddress/:planIndex',
+  addSubscription: '/addSubscription/:providerAddress/:planIndex/:userAddress/:finishTime',
 };
 const MAIN_ROUTE = '/subsCrypt';
-Object.keys(routes).forEach((value) => {
-  router.get(routes[value], tasks[value]);
-});
+Object.keys(routes)
+  .forEach((value) => {
+    router.get(routes[value], tasks[value]);
+  });
 
 // router.get('/userCheckAuth', tasks.userCheckAuth);
 // router.get('/providerCheckAuth', tasks.providerCheckAuth);
