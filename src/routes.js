@@ -3,9 +3,14 @@ const {MAIN_ROUTE} = require("./subsCrypt/router");
 const router = require('express').Router();
 const errors = require('./errors');
 const subsCryptRouter = require('./subsCrypt/router');
+const dataRouter = require('./fileManager/router');
+
+
 
 // Wire up routers
 router.use(MAIN_ROUTE, subsCryptRouter.router);
+router.use('file/', dataRouter.router);
+
 
 // Wire up error-handling middleware
 router.use(errors.errorHandler);
