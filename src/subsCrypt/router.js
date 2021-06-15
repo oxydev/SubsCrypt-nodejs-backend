@@ -26,7 +26,7 @@ const routes = {
   addUser: '/addUser/:userAddress', // TODO : remove add to database functions
   addProvider: '/addProvider/:providerAddress',
   addProduct: '/addProduct/:providerAddress/:planIndex',
-  addSubscription: '/addSubscription/:providerAddress/:planIndex/:userAddress/:finishTime',
+  addSubscription: '/addSubscription/:providerAddress/:planIndex/:userAddress/:startTime/:duration',
 };
 const MAIN_ROUTE = '/subsCrypt';
 Object.keys(routes)

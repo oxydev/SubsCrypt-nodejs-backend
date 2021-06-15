@@ -303,7 +303,8 @@ async function addSubscription(req, res) {
     req.params.userAddress,
     req.params.providerAddress,
     req.params.planIndex,
-    req.params.finishTime,
+    req.params.startTime,
+    req.params.duration,
   );
   res.status(200)
     .json('');

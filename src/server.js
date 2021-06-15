@@ -11,7 +11,7 @@ const docs = require('./docs');
 // Logging
 const logger = require('./logger');
 
-require('./eventManager/eventListener');
+// require('./eventManager/eventListener');
 // Config
 
 // Set up middleware for request parsing, logging, etc.
