@@ -16,7 +16,10 @@ const uploadProviders = multer({
 
 router.post('/newProviderRegister', uploadProviders.single('profile'), index.setProviderProfile);
 router.patch('/updateProviderPic', uploadProviders.single('profile'), index.updateProviderProfile);
+router.patch('/updateProductProfile', index.updateProductProfile);
 router.get('/getProviderPic/:providerAddress', index.getProviderProfile);
+router.get('/getProviderDescription/:providerAddress', index.getProviderDescription);
+router.get('/getProductDescription/:providerAddress/:planIndex', index.getProductDescription);
 // router.get('/getProductPic/:providerAddress/:planIndex', index.getProductProfile);
 
 // Export the router
