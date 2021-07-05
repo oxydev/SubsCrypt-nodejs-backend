@@ -27,6 +27,12 @@ app.use(
 // Load up the routes
 app.use('/', routes);
 
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*'); // update to match the domain you will make the request from
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
+
 // Start the API
 app.listen(config.apiPort);
 logger.log('info', `api running on port ${config.apiPort}`);

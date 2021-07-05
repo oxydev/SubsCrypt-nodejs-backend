@@ -13,7 +13,7 @@
     "start": "npm run serve"
   },
   "dependencies": {
-    "@oxydev/subscrypt": "0.1.1",
+    "@oxydev/subscrypt": "0.1.2",
     "config": "^3.3.6",
     "express": "4.17.1",
     "morgan": "1.10.0",
