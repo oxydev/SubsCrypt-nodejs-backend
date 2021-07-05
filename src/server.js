@@ -14,6 +14,7 @@ const logger = require('./logger');
 
 // require('./eventManager/eventListener');
 // Config
+app.use(cors());
 
 // Set up middleware for request parsing, logging, etc.
 app.use(express.json());
@@ -27,7 +28,6 @@ app.use(
 );
 // Load up the routes
 app.use('/', routes);
-app.use(cors());
 
 // Start the API
 app.listen(config.apiPort);
