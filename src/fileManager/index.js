@@ -11,7 +11,6 @@ async function setProviderProfile(req, res) {
     );
     res.send(req.file.filename);
   } catch (err) {
-    console.log(err);
     res.send(400);
   }
 }
@@ -42,10 +41,15 @@ async function updateProviderProfile(req, res) {
 
 async function updateProductProfile(req, res) {
   try {
-    db.updateProductDescription(req.body.providerAddress, req.body.planIndex, req.body.description);
-    res.send(req.file.filename);
+    db.updateProductDescription(
+      req.body.providerAddress,
+      req.body.planName,
+      req.body.planIndex,
+      req.body.description,
+    );
+    res.sendStatus(200);
   } catch (err) {
-    res.send(400);
+    res.sendStatus(400);
   }
 }
 

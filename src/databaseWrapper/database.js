@@ -38,9 +38,20 @@ function addProvider(providerAddress) {
   db.run(insert, [providerAddress]);
 }
 
-function addProduct(providerAddress, planIndex) {
-  const insert = 'INSERT OR IGNORE INTO products (provider_id, plan_index) VALUES ((SELECT id from providers WHERE provider_address=?), ?)';
-  db.run(insert, [providerAddress, planIndex]);
+function addProduct(providerAddress, planIndex, fallback = undefined) {
+  const query = 'select products.description, planName from products'
+    + ' join providers on provider_id = providers.ID \n'
+    + ' where provider_address = ? and plan_index = ?';
+  db.get(query, [providerAddress, planIndex], (err, resp) => {
+    if (resp === undefined) {
+      const insert = 'INSERT OR IGNORE INTO products (provider_id, plan_index) VALUES ((SELECT id from providers WHERE provider_address=?), ?)';
+      if (fallback === undefined) {
+        db.run(insert, [providerAddress, planIndex]);
+      } else {
+        db.run(insert, [providerAddress, planIndex], fallback);
+      }
+    }
+  });
 }
 
 function addSubscription(userAddress, providerAddress, planIndex, startTime, duration) {
@@ -93,10 +104,13 @@ function setProviderProfile(providerAddress, description, name, fileID) {
 }
 
 function updateProductDescription(providerAddress, name, planIndex, description) {
-  const insert = 'UPDATE products SET planName, description = (?, ?)'
-    + 'join providers on provider_id = providers.ID \n'
-    + 'where provider_address = ? and plan_index = ?';
-  db.run(insert, [description, name, providerAddress, planIndex]);
+  function fallback() {
+    const insert = 'UPDATE products SET (planName, description) = (?, ?)'
+      + ' where provider_id = (SELECT ID from providers WHERE provider_address = (?)) and plan_index = (?)';
+    db.run(insert, [description, name, providerAddress, planIndex]);
+  }
+
+  addProduct(providerAddress, planIndex, fallback);
 }
 
 function getPic(path, res) {
@@ -138,12 +152,15 @@ function getProviderDescription(providerAddress, res) {
 // }
 //
 function getProductDescription(providerAddress, planIndex, res) {
-  const insert = 'select profile_id from products'
-    + 'join providers on provider_id = providers.ID \n'
-    + 'where provider_address = ? and plan_index = ?';
+  const insert = 'select products.description, planName from products'
+    + ' join providers on provider_id = providers.ID \n'
+    + ' where provider_address = ? and plan_index = ?';
   return db.get(insert, [providerAddress, planIndex], (error, row) => {
     res.status(400)
-      .json(row.description, row.planName);
+      .json({
+        description: row.description,
+        name: row.planName,
+      });
   });
 }
 
