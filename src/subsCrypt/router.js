@@ -23,10 +23,14 @@ const routes = {
   getPlanCharacteristics: '/getPlanCharacteristics/:providerAddress/:planIndex',
   getUsers: '/getUsers/:providerAddress',
   getUsersOfPlan: '/getUsers/:providerAddress/:planIndex',
+  getProviderData: '/getProviderData/:providerAddress',
+  getProviderCustomIncome: '/getProviderCustomIncome/:providerAddress/:start/:finish',
+  getPlanIncome: '/getProviderCustomIncome/:providerAddress',
+  getPlanCustomIncome: '/getPlanIncome/:providerAddress/:PlanIndex/:start/:finish',
   addUser: '/addUser/:userAddress', // TODO : remove add to database functions
   addProvider: '/addProvider/:providerAddress',
   addProduct: '/addProduct/:providerAddress/:planIndex',
-  addSubscription: '/addSubscription/:providerAddress/:planIndex/:userAddress/:startTime/:duration',
+  addSubscription: '/addSubscription/:providerAddress/:planIndex/:userAddress/:startTime/:duration/:price',
 };
 const MAIN_ROUTE = '/subsCrypt';
 Object.keys(routes)

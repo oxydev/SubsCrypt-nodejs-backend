@@ -15,13 +15,13 @@ function initDb() {
   db.run('CREATE TABLE IF NOT EXISTS "users" ("ID" INTEGER,"user_address" TEXT UNIQUE ,PRIMARY KEY("id"))',
     () => {
     });
-  db.run('CREATE TABLE IF NOT EXISTS "providers" ("ID" INTEGER,"provider_address" TEXT UNIQUE, "profile_pic_id" TEXT UNIQUE,"providerName" TEXT, "description" TEXT, PRIMARY KEY("ID"))',
+  db.run('CREATE TABLE IF NOT EXISTS "providers" ("ID" INTEGER,"provider_address" TEXT UNIQUE, "profile_pic_id" TEXT UNIQUE,"providerName" TEXT, "description" TEXT,"total_income" INTEGER, PRIMARY KEY("ID"))',
     () => {
     });
   db.run('CREATE TABLE IF NOT EXISTS "products" ("ID" INTEGER, "provider_id" INTEGER, "description" TEXT, "planName" TEXT, "plan_index" INTEGER, PRIMARY KEY("ID"),FOREIGN KEY("provider_id") REFERENCES "providers"("ID"))',
     () => {
     });
-  db.run('CREATE TABLE IF NOT EXISTS _product_user_relationships (user_reference INTEGER, product_reference INTEGER, "start_time" INTEGER , "duration" INTEGER)',
+  db.run('CREATE TABLE IF NOT EXISTS _product_user_relationships (user_reference INTEGER, product_reference INTEGER, "start_time" INTEGER , "duration" INTEGER, "price" INTEGER)',
     () => {
     });
 }
@@ -39,7 +39,7 @@ function addProvider(providerAddress) {
 }
 
 function addProduct(providerAddress, planIndex, fallback = undefined) {
-  const query = 'select products.description, planName from products'
+  const query = 'select existsproducts.description, planName from products'
     + ' join providers on provider_id = providers.ID \n'
     + ' where provider_address = ? and plan_index = ?';
   db.get(query, [providerAddress, planIndex], (err, resp) => {
@@ -54,9 +54,11 @@ function addProduct(providerAddress, planIndex, fallback = undefined) {
   });
 }
 
-function addSubscription(userAddress, providerAddress, planIndex, startTime, duration) {
-  const insert = 'INSERT OR IGNORE INTO _product_user_relationships (user_reference, product_reference, start_time, duration) VALUES ((SELECT id from users WHERE user_address=?), (SELECT id from products WHERE provider_id = (SELECT id from providers WHERE provider_address=?) and plan_index=?), ?)';
-  db.run(insert, [userAddress, providerAddress, planIndex, startTime, duration]);
+function addSubscription(userAddress, providerAddress, planIndex, startTime, duration, price) {
+  const insert = 'INSERT OR IGNORE INTO _product_user_relationships (user_reference, product_reference, start_time, duration, price) VALUES ((SELECT id from users WHERE user_address=?), (SELECT id from products WHERE provider_id = (SELECT id from providers WHERE provider_address=?) and plan_index=?), ?, ?, ?)';
+  db.run(insert, [userAddress, providerAddress, planIndex, startTime, duration, price]);
+  const increment = 'UPDATE providers SET total_income = total_income + ? WHERE provider_address = ?';
+  db.run(increment, [price, providerAddress]);
 }
 
 function getUsers(providerAddress, res) {
@@ -78,6 +80,43 @@ function getUsers(providerAddress, res) {
   });
 }
 
+function getUsersCount(providerAddress, fallback) {
+  const insert = 'SELECT count(*) AS count from users \n'
+    + 'join _product_user_relationships on users.id = user_reference\n'
+    + 'join products on _product_user_relationships.product_reference = products.ID\n'
+    + 'join providers on provider_id = providers.ID \n'
+    + 'where provider_address = ?';
+  db.all(insert, [providerAddress], fallback);
+}
+
+function getProviderCustomIncome(providerAddress, f3) {
+  const insert = 'select * from _product_user_relationships'
+    + ' join products on _product_user_relationships.product_reference = products.ID'
+    + ' join providers on provider_id = providers.ID'
+    + ' where provider_address = (?)';
+  db.all(insert, [providerAddress], f3);
+}
+
+function getPlanCustomIncome(providerAddress, planIndex, f3) {
+  const insert = 'select * from _product_user_relationships'
+    + ' join products on _product_user_relationships.product_reference = products.ID'
+    + ' join providers on provider_id = providers.ID'
+    + ' where provider_address = (?) and plan_index = ?';
+  db.all(insert, [providerAddress, planIndex], f3);
+}
+
+function getProviderIncome(providerAddress, f2) {
+  const insert = 'select total_income from providers where provider_address = (?)';
+  db.get(insert, [providerAddress], f2);
+}
+
+function getPlanIncome(providerAddress, planIndex, f2) {
+  const insert = 'select products.total_income from products'
+    + ' join products on provider_id = providers.ID'
+    + ' where provider_address = (?) and plan_index = ?';
+  db.get(insert, [providerAddress, planIndex], f2);
+}
+
 function getUsersOfPlan(providerAddress, planIndex, res) {
   const insert = 'SELECT user_address, finish_time, provider_address, plan_index from users \n'
     + 'join _product_user_relationships on users.id = user_reference\n'
@@ -95,6 +134,15 @@ function getUsersOfPlan(providerAddress, planIndex, res) {
       data: rows,
     });
   });
+}
+
+function getPlanUsersCount(providerAddress, planIndex, fallback) {
+  const insert = 'SELECT count(*) as count from users \n'
+    + 'join _product_user_relationships on users.id = user_reference\n'
+    + 'join products on _product_user_relationships.product_reference = products.ID\n'
+    + 'join providers on provider_id = providers.ID \n'
+    + 'where provider_address = ? and plan_index = ?';
+  return db.all(insert, [providerAddress, planIndex], fallback);
 }
 
 function setProviderProfile(providerAddress, description, name, fileID) {
@@ -170,6 +218,12 @@ module.exports = {
   getProviderDescription,
   getProductDescription,
   setProviderProfile,
+  getUsersCount,
+  getProviderIncome,
+  getProviderCustomIncome,
+  getPlanIncome,
+  getPlanUsersCount,
+  getPlanCustomIncome,
   addUser,
   addProvider,
   addProduct,

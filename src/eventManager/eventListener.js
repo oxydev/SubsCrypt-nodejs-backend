@@ -20,7 +20,9 @@ subscrypt.getEvents((events) => {
         db.addUser(eventDecoded.args[2].toString());
         db.addSubscription(eventDecoded.args[2].toString(), eventDecoded.args[0].toString(),
           eventDecoded.args[1].toNumber(),
-          eventDecoded.args[3].toNumber(), eventDecoded.args[4].toNumber());
+          eventDecoded.args[3].toNumber(),
+          eventDecoded.args[4].toNumber(),
+          eventDecoded.args[5].toNumber());
       } else if (eventDecoded.event.identifier === 'ProviderRegisterEvent') { // providerAddress
         db.addProvider(eventDecoded.args[0].toString());
       }

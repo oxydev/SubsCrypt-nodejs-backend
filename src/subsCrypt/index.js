@@ -274,6 +274,77 @@ async function userCheckAuth(req, res, next) {
   }
 }
 
+async function getProviderData(req, res) {
+  const json = {};
+  try {
+    const f2 = function (err, row) {
+      json.income = row.total_income;
+      res.status(200)
+        .json(json);
+    };
+    const f1 = function (err, rows) {
+      json.userCount = rows[0].count;
+      db.getProviderIncome(req.params.providerAddress, f2);
+    };
+    db.getUsersCount(req.params.providerAddress, f1);
+  } catch (err) {
+    res.status(500)
+      .json(err);
+  }
+}
+
+async function getProviderCustomIncome(req, res) {
+  const json = {};
+  const f3 = function (err, rows) {
+    let customTimeIncom = 0;
+    rows.forEach((row) => {
+      if (row.start_time > req.params.start && row.start_time < req.params.finish) {
+        customTimeIncom += row.price;
+      }
+    });
+
+    json.customTimeIncom = customTimeIncom;
+    res.status(200)
+      .json(json);
+  };
+  db.getProviderCustomIncome(req.params.providerAddress, f3);
+}
+
+async function getPlanIncome(req, res) {
+  const json = {};
+  try {
+    const f2 = function (err, row) {
+      json.income = row.total_income;
+      res.status(200)
+        .json(json);
+    };
+    const f1 = function (err, rows) {
+      json.userCount = rows[0].count;
+      db.getPlanIncome(req.params.providerAddress, req.params.planIndex, f2);
+    };
+    db.getPlanUsersCount(req.params.providerAddress, req.params.planIndex, f1);
+  } catch (err) {
+    res.status(500)
+      .json(err);
+  }
+}
+
+async function getPlanCustomIncome(req, res) {
+  const json = {};
+  const f3 = function (err, rows) {
+    let customTimeIncom = 0;
+    rows.forEach((row) => {
+      if (row.start_time > req.params.start && row.start_time < req.params.finish) {
+        customTimeIncom += row.price;
+      }
+    });
+    json.customTimeIncom = customTimeIncom;
+    res.status(200)
+      .json(json);
+  };
+  db.getPlanCustomIncome(req.params.providerAddress, req.params.planIndex, f3);
+}
+
 async function getUsers(req, res) {
   await db.getUsers(req.params.providerAddress, res);
 }
@@ -284,12 +355,14 @@ async function getUsersOfPlan(req, res) {
 
 async function addUser(req, res) {
   await db.addUser(req.params.userAddress);
-  res.status(200).json('');
+  res.status(200)
+    .json('');
 }
 
 async function addProvider(req, res) {
   await db.addProvider(req.params.providerAddress);
-  res.status(200).json('');
+  res.status(200)
+    .json('');
 }
 
 async function addProduct(req, res) {
@@ -305,6 +378,7 @@ async function addSubscription(req, res) {
     req.params.planIndex,
     req.params.startTime,
     req.params.duration,
+    req.params.price,
   );
   res.status(200)
     .json('');
@@ -325,8 +399,12 @@ module.exports = {
   retrieveDataWithUsername,
   retrieveWholeDataWithUsername,
   getPlanData,
+  getPlanIncome,
   getPlanCharacteristics,
   getPlanLength,
+  getProviderData,
+  getProviderCustomIncome,
+  getPlanCustomIncome,
   getUsers,
   getUsersOfPlan,
   addUser,
