@@ -162,7 +162,7 @@ function getPic(path, res) {
     res.setHeader('Content-Disposition', `attachment: filename="${filename}"`);
     file.pipe(res);
   } catch (err) {
-    res.sendStatus(400);
+    res.sendStatus(200);
   }
 }
 
@@ -173,7 +173,7 @@ function getProviderProfile(providerAddress, res) {
       const path = providersPath + row.profile_pic_id;
       getPic(path, res);
     } else {
-      res.status(400).json();
+      res.status(200).json();
     }
   });
 }
@@ -182,13 +182,13 @@ function getProviderDescription(providerAddress, res) {
   const insert = 'select description, providerName from providers where provider_address = (?)';
   db.get(insert, [providerAddress], (error, row) => {
     if (row) {
-      res.status(400)
+      res.status(200)
         .json({
           description: row.description,
           name: row.providerName,
         });
     } else {
-      res.status(400)
+      res.status(200)
         .json();
     }
   });
@@ -208,13 +208,13 @@ function getProductDescription(providerAddress, planIndex, res) {
     + ' where provider_address = ? and plan_index = ?';
   return db.get(insert, [providerAddress, planIndex], (error, row) => {
     if (row) {
-      res.status(400)
+      res.status(200)
         .json({
           description: row.description,
           name: row.planName,
         });
     } else {
-      res.status(400)
+      res.status(200)
         .json();
     }
   });
