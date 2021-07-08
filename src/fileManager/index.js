@@ -41,6 +41,7 @@ async function updateProviderProfile(req, res) {
 
 async function updateProductProfile(req, res) {
   try {
+    console.log(req.body);
     db.updateProductDescription(
       req.body.providerAddress,
       req.body.planName,
