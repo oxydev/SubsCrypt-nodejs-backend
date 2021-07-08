@@ -44,7 +44,7 @@ function addProduct(providerAddress, planIndex, fallback = undefined) {
     + ' where provider_address = ? and plan_index = ?';
   db.get(query, [providerAddress, planIndex], (err, resp) => {
     if (resp === undefined) {
-      const insert = 'INSERT OR IGNORE INTO products (provider_id, plan_index, total_income) VALUES ((SELECT id from providers WHERE provider_address=?), ?, 0)';
+      const insert = 'INSERT OR IGNORE INTO products (provider_id, plan_index) VALUES ((SELECT id from providers WHERE provider_address=?), ?)';
       if (fallback === undefined) {
         db.run(insert, [providerAddress, planIndex]);
       } else {
