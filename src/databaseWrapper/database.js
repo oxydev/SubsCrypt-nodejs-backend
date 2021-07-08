@@ -168,19 +168,28 @@ function getPic(path, res) {
 function getProviderProfile(providerAddress, res) {
   const insert = 'select profile_pic_id from providers where provider_address = (?)';
   db.get(insert, [providerAddress], (error, row) => {
-    const path = providersPath + row.profile_pic_id;
-    getPic(path, res);
+    if (row) {
+      const path = providersPath + row.profile_pic_id;
+      getPic(path, res);
+    } else {
+      res.status(400).json();
+    }
   });
 }
 
 function getProviderDescription(providerAddress, res) {
   const insert = 'select description, providerName from providers where provider_address = (?)';
   db.get(insert, [providerAddress], (error, row) => {
-    res.status(400)
-      .json({
-        description: row.description,
-        name: row.providerName,
-      });
+    if (row) {
+      res.status(400)
+        .json({
+          description: row.description,
+          name: row.providerName,
+        });
+    } else {
+      res.status(400)
+        .json();
+    }
   });
 }
 
@@ -197,11 +206,16 @@ function getProductDescription(providerAddress, planIndex, res) {
     + ' join providers on provider_id = providers.ID \n'
     + ' where provider_address = ? and plan_index = ?';
   return db.get(insert, [providerAddress, planIndex], (error, row) => {
-    res.status(400)
-      .json({
-        description: row.description,
-        name: row.planName,
-      });
+    if (row) {
+      res.status(400)
+        .json({
+          description: row.description,
+          name: row.planName,
+        });
+    } else {
+      res.status(400)
+        .json();
+    }
   });
 }
 
