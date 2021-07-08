@@ -50,6 +50,8 @@ function addProduct(providerAddress, planIndex, fallback = undefined) {
       } else {
         db.run(insert, [providerAddress, planIndex], fallback);
       }
+    } else {
+      fallback();
     }
   });
 }
