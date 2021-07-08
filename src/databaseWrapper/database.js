@@ -148,9 +148,8 @@ function updateProductDescription(providerAddress, name, planIndex, description)
   function fallback() {
     const insert = 'UPDATE products SET (planName, description) = (?, ?)'
       + ' where provider_id = (SELECT ID from providers WHERE provider_address = (?)) and plan_index = (?)';
-    db.run(insert, [description, name, providerAddress, planIndex]);
+    db.run(insert, [name, description, providerAddress, planIndex]);
   }
-
   addProduct(providerAddress, planIndex, fallback);
 }
 
