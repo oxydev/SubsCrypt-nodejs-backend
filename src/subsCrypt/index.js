@@ -313,14 +313,22 @@ async function getProviderCustomIncome(req, res) {
 async function getPlanIncome(req, res) {
   const json = {};
   try {
-    const f2 = function (err, row) {
-      json.income = row.total_income;
+    const f2 = function (err, rows) {
+      if (rows) {
+        let customTimeIncom = 0;
+        rows.forEach((row) => {
+          customTimeIncom += row.price;
+        });
+        json.income = customTimeIncom;
+      } else {
+        json.income = 0;
+      }
       res.status(200)
         .json(json);
     };
     const f1 = function (err, rows) {
       json.userCount = rows[0].count;
-      db.getPlanIncome(req.params.providerAddress, req.params.planIndex, f2);
+      db.getPlanCustomIncome(req.params.providerAddress, req.params.planIndex, f2);
     };
     db.getPlanUsersCount(req.params.providerAddress, req.params.planIndex, f1);
   } catch (err) {

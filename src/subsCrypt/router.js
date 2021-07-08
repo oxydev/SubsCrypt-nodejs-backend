@@ -25,8 +25,8 @@ const routes = {
   getUsersOfPlan: '/getUsers/:providerAddress/:planIndex',
   getProviderData: '/getProviderData/:providerAddress',
   getProviderCustomIncome: '/getProviderCustomIncome/:providerAddress/:start/:finish',
-  getPlanIncome: '/getProviderCustomIncome/:providerAddress',
-  getPlanCustomIncome: '/getPlanIncome/:providerAddress/:PlanIndex/:start/:finish',
+  getPlanIncome: '/getPlanIncome/:providerAddress/:planIndex',
+  getPlanCustomIncome: '/getPlanIncomeCustomIncome/:providerAddress/:PlanIndex/:start/:finish',
   addUser: '/addUser/:userAddress', // TODO : remove add to database functions
   addProvider: '/addProvider/:providerAddress',
   addProduct: '/addProduct/:providerAddress/:planIndex',

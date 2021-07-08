@@ -34,17 +34,17 @@ function addUser(userAddress) {
 }
 
 function addProvider(providerAddress) {
-  const insert = 'INSERT OR IGNORE INTO providers (provider_address) VALUES (?)';
+  const insert = 'INSERT OR IGNORE INTO providers (provider_address, total_income) VALUES (?, 0)';
   db.run(insert, [providerAddress]);
 }
 
 function addProduct(providerAddress, planIndex, fallback = undefined) {
-  const query = 'select existsproducts.description, planName from products'
+  const query = 'select products.description, planName from products'
     + ' join providers on provider_id = providers.ID \n'
     + ' where provider_address = ? and plan_index = ?';
   db.get(query, [providerAddress, planIndex], (err, resp) => {
     if (resp === undefined) {
-      const insert = 'INSERT OR IGNORE INTO products (provider_id, plan_index) VALUES ((SELECT id from providers WHERE provider_address=?), ?)';
+      const insert = 'INSERT OR IGNORE INTO products (provider_id, plan_index, total_income) VALUES ((SELECT id from providers WHERE provider_address=?), ?, 0)';
       if (fallback === undefined) {
         db.run(insert, [providerAddress, planIndex]);
       } else {
@@ -108,13 +108,6 @@ function getPlanCustomIncome(providerAddress, planIndex, f3) {
 function getProviderIncome(providerAddress, f2) {
   const insert = 'select total_income from providers where provider_address = (?)';
   db.get(insert, [providerAddress], f2);
-}
-
-function getPlanIncome(providerAddress, planIndex, f2) {
-  const insert = 'select products.total_income from products'
-    + ' join products on provider_id = providers.ID'
-    + ' where provider_address = (?) and plan_index = ?';
-  db.get(insert, [providerAddress, planIndex], f2);
 }
 
 function getUsersOfPlan(providerAddress, planIndex, res) {
@@ -221,7 +214,6 @@ module.exports = {
   getUsersCount,
   getProviderIncome,
   getProviderCustomIncome,
-  getPlanIncome,
   getPlanUsersCount,
   getPlanCustomIncome,
   addUser,
