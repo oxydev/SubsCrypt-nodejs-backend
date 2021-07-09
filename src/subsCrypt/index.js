@@ -1,4 +1,5 @@
 const subscrypt = require('@oxydev/subscrypt');
+const db = require('../databaseWrapper/database');
 const errors = require('../errors');
 
 const refactorRes = (response) => {
@@ -10,13 +11,19 @@ const refactorRes = (response) => {
 async function checkSubscription(req, res, next) {
   try {
     await subscrypt.checkSubscription(req.query.userAddress, req.query.providerAddress,
-      req.query.planIndex).then((resp) => {
-      const arr = refactorRes(resp);
-      if (arr[0] === 200) res.status(arr[0]).json(arr[1]);
-      else next(errors.newHttpError(arr[0], arr[1]));
-    }).catch(() => {
-      next(errors.newHttpError(404, 'Wrong Args'));
-    });
+      req.query.planIndex)
+      .then((resp) => {
+        const arr = refactorRes(resp);
+        if (arr[0] === 200) {
+          res.status(arr[0])
+            .json(arr[1]);
+        } else {
+          next(errors.newHttpError(arr[0], arr[1]));
+        }
+      })
+      .catch(() => {
+        next(errors.newHttpError(404, 'Wrong Args'));
+      });
   } catch {
     next(errors.newHttpError(404, 'Wrong Args'));
   }
@@ -26,7 +33,8 @@ async function isConnected(req, res, next) {
   res.setTimeout(5000, () => {
     next(errors.newHttpError(500, 'NotConnected'));
   });
-  res.status(200).json(await subscrypt.isConnected());
+  res.status(200)
+    .json(await subscrypt.isConnected());
 }
 
 async function checkSubscriptionWithUsername(req, res, next) {
@@ -35,10 +43,15 @@ async function checkSubscriptionWithUsername(req, res, next) {
       req.query.providerAddress, req.query.planIndex)
       .then((resp) => {
         const arr = refactorRes(resp);
-        if (arr[0] === 200) res.status(arr[0]).json(arr[1]);
-        else next(errors.newHttpError(arr[0], arr[1]));
+        if (arr[0] === 200) {
+          res.status(arr[0])
+            .json(arr[1]);
+        } else {
+          next(errors.newHttpError(arr[0], arr[1]));
+        }
         // todo check if fix in next version of contract
-      }).catch(() => {
+      })
+      .catch(() => {
         next(errors.newHttpError(404, 'Wrong Args'));
       });
   } catch {
@@ -48,13 +61,19 @@ async function checkSubscriptionWithUsername(req, res, next) {
 
 async function getUsername(req, res, next) {
   try {
-    await subscrypt.getUsername(req.params.address).then((resp) => {
-      const arr = refactorRes(resp);
-      if (arr[0] === 200) res.status(arr[0]).json(arr[1]);
-      else res.status(200);
-    }).catch(() => {
-      next(errors.newHttpError(404, 'Wrong Args'));
-    });
+    await subscrypt.getUsername(req.params.address)
+      .then((resp) => {
+        const arr = refactorRes(resp);
+        if (arr[0] === 200) {
+          res.status(arr[0])
+            .json(arr[1]);
+        } else {
+          res.status(200);
+        }
+      })
+      .catch(() => {
+        next(errors.newHttpError(404, 'Wrong Args'));
+      });
   } catch {
     next(errors.newHttpError(404, 'Wrong Args'));
   }
@@ -63,12 +82,15 @@ async function getUsername(req, res, next) {
 async function retrieveDataWithUsername(req, res, next) {
   try {
     await subscrypt.retrieveDataWithUsername(req.query.username, req.params.providerAddress,
-      req.query.phrase).then((resp) => {
-      const arr = refactorRes(resp);
-      res.status(arr[0]).json(arr[1]);
-    }).catch(() => {
-      next(errors.newHttpError(404, 'Wrong Args'));
-    });
+      req.query.phrase)
+      .then((resp) => {
+        const arr = refactorRes(resp);
+        res.status(arr[0])
+          .json(arr[1]);
+      })
+      .catch(() => {
+        next(errors.newHttpError(404, 'Wrong Args'));
+      });
   } catch {
     next(errors.newHttpError(404, 'Wrong Args'));
   }
@@ -76,12 +98,15 @@ async function retrieveDataWithUsername(req, res, next) {
 
 async function getPlanData(req, res, next) {
   try {
-    await subscrypt.getPlanData(req.params.providerAddress, req.params.planIndex).then((resp) => {
-      const arr = refactorRes(resp);
-      res.status(arr[0]).json(arr[1]);
-    }).catch(() => {
-      next(errors.newHttpError(404, 'Wrong Args'));
-    });
+    await subscrypt.getPlanData(req.params.providerAddress, req.params.planIndex)
+      .then((resp) => {
+        const arr = refactorRes(resp);
+        res.status(arr[0])
+          .json(arr[1]);
+      })
+      .catch(() => {
+        next(errors.newHttpError(404, 'Wrong Args'));
+      });
   } catch {
     next(errors.newHttpError(404, 'Wrong Args'));
   }
@@ -89,12 +114,15 @@ async function getPlanData(req, res, next) {
 
 async function getPlanLength(req, res, next) {
   try {
-    await subscrypt.getPlanLength(req.params.providerAddress).then((resp) => {
-      const arr = refactorRes(resp);
-      res.status(arr[0]).json(arr[1]);
-    }).catch(() => {
-      next(errors.newHttpError(404, 'Wrong Args'));
-    });
+    await subscrypt.getPlanLength(req.params.providerAddress)
+      .then((resp) => {
+        const arr = refactorRes(resp);
+        res.status(arr[0])
+          .json(arr[1]);
+      })
+      .catch(() => {
+        next(errors.newHttpError(404, 'Wrong Args'));
+      });
   } catch {
     next(errors.newHttpError(404, 'Wrong Args'));
   }
@@ -105,8 +133,10 @@ async function getPlanCharacteristics(req, res, next) {
     await subscrypt.getPlanCharacteristics(req.params.providerAddress, req.params.planIndex)
       .then((resp) => {
         const arr = refactorRes(resp);
-        res.status(arr[0]).json(arr[1]);
-      }).catch(() => {
+        res.status(arr[0])
+          .json(arr[1]);
+      })
+      .catch(() => {
         next(errors.newHttpError(404, 'Wrong Args'));
       });
   } catch {
@@ -119,8 +149,10 @@ async function retrieveWholeDataWithUsername(req, res, next) {
     await subscrypt.retrieveWholeDataWithUsername(req.query.username, req.query.phrase)
       .then((resp) => {
         const arr = refactorRes(resp);
-        res.status(arr[0]).json(arr[1]);
-      }).catch(() => {
+        res.status(arr[0])
+          .json(arr[1]);
+      })
+      .catch(() => {
         next(errors.newHttpError(404, 'Wrong Args'));
       });
   } catch {
@@ -130,12 +162,15 @@ async function retrieveWholeDataWithUsername(req, res, next) {
 
 async function isUsernameAvailable(req, res, next) {
   try {
-    await subscrypt.isUsernameAvailable(req.params.username).then((resp) => {
-      const arr = refactorRes(resp);
-      res.status(arr[0]).json(arr[1]);
-    }).catch(() => {
-      next(errors.newHttpError(404, 'Wrong Args'));
-    });
+    await subscrypt.isUsernameAvailable(req.params.username)
+      .then((resp) => {
+        const arr = refactorRes(resp);
+        res.status(arr[0])
+          .json(arr[1]);
+      })
+      .catch(() => {
+        next(errors.newHttpError(404, 'Wrong Args'));
+      });
   } catch {
     next(errors.newHttpError(404, 'Wrong Args'));
   }
@@ -146,8 +181,10 @@ async function userCheckAuthWithUsername(req, res, next) {
     await subscrypt.userCheckAuthWithUsername(req.params.username, req.query.phrase)
       .then((resp) => {
         const arr = refactorRes(resp);
-        res.status(arr[0]).json(arr[1]);
-      }).catch(() => {
+        res.status(arr[0])
+          .json(arr[1]);
+      })
+      .catch(() => {
         next(errors.newHttpError(404, 'Wrong Args'));
       });
   } catch {
@@ -160,8 +197,10 @@ async function providerCheckAuthWithUsername(req, res, next) {
     await subscrypt.providerCheckAuthWithUsername(req.params.username, req.query.phrase)
       .then((resp) => {
         const arr = refactorRes(resp);
-        res.status(arr[0]).json(arr[1]);
-      }).catch(() => {
+        res.status(arr[0])
+          .json(arr[1]);
+      })
+      .catch(() => {
         next(errors.newHttpError(404, 'Wrong Args'));
       });
   } catch {
@@ -172,12 +211,31 @@ async function providerCheckAuthWithUsername(req, res, next) {
 async function checkAuthWithUsername(req, res, next) {
   try {
     await subscrypt.checkAuthWithUsername(req.params.username, req.query.providerAddress,
-      req.query.phrase).then((resp) => {
-      const arr = refactorRes(resp);
-      res.status(arr[0]).json(arr[1]);
-    }).catch(() => {
-      next(errors.newHttpError(404, 'Wrong Args'));
-    });
+      req.query.phrase)
+      .then((resp) => {
+        const arr = refactorRes(resp);
+        res.status(arr[0])
+          .json(arr[1]);
+      })
+      .catch(() => {
+        next(errors.newHttpError(404, 'Wrong Args'));
+      });
+  } catch {
+    next(errors.newHttpError(404, 'Wrong Args'));
+  }
+}
+
+async function getSha2(req, res, next) {
+  try {
+    await subscrypt.getSha2(req.query.string)
+      .then((resp) => {
+        const arr = refactorRes(resp);
+        res.status(arr[0])
+          .json(arr[1]);
+      })
+      .catch(() => {
+        next(errors.newHttpError(404, 'Wrong Args'));
+      });
   } catch {
     next(errors.newHttpError(404, 'Wrong Args'));
   }
@@ -188,8 +246,10 @@ async function checkAuth(req, res, next) {
     await subscrypt.checkAuth(req.query.userAddress, req.query.providerAddress, req.query.phrase)
       .then((resp) => {
         const arr = refactorRes(resp);
-        res.status(arr[0]).json(arr[1]);
-      }).catch(() => {
+        res.status(arr[0])
+          .json(arr[1]);
+      })
+      .catch(() => {
         next(errors.newHttpError(404, 'Wrong Args'));
       });
   } catch {
@@ -202,8 +262,10 @@ async function providerCheckAuth(req, res, next) {
     await subscrypt.providerCheckAuth(req.query.providerAddress, req.query.phrase)
       .then((resp) => {
         const arr = refactorRes(resp);
-        res.status(arr[0]).json(arr[1]);
-      }).catch(() => {
+        res.status(arr[0])
+          .json(arr[1]);
+      })
+      .catch(() => {
         next(errors.newHttpError(404, 'Wrong Args'));
       });
   } catch {
@@ -216,13 +278,134 @@ async function userCheckAuth(req, res, next) {
     await subscrypt.userCheckAuth(req.query.userAddress, req.query.phrase)
       .then((resp) => {
         const arr = refactorRes(resp);
-        res.status(arr[0]).json(arr[1]);
-      }).catch((err) => {
-        res.status(500).json(err);
+        res.status(arr[0])
+          .json(arr[1]);
+      })
+      .catch((err) => {
+        res.status(500)
+          .json(err);
       });
   } catch {
     next(errors.newHttpError(404, 'Wrong Args'));
   }
+}
+
+async function getProviderData(req, res) {
+  const json = {};
+  try {
+    const f2 = function (err, row) {
+      json.income = row.total_income;
+      res.status(200)
+        .json(json);
+    };
+    const f1 = function (err, rows) {
+      json.userCount = rows[0].count;
+      db.getProviderIncome(req.params.providerAddress, f2);
+    };
+    db.getUsersCount(req.params.providerAddress, f1);
+  } catch (err) {
+    res.status(500)
+      .json(err);
+  }
+}
+
+async function getProviderCustomIncome(req, res) {
+  const json = {};
+  const f3 = function (err, rows) {
+    let customTimeIncom = 0;
+    rows.forEach((row) => {
+      if (row.start_time > req.params.start && row.start_time < req.params.finish) {
+        customTimeIncom += row.price;
+      }
+    });
+
+    json.customTimeIncom = customTimeIncom;
+    res.status(200)
+      .json(json);
+  };
+  db.getProviderCustomIncome(req.params.providerAddress, f3);
+}
+
+async function getPlanIncome(req, res) {
+  const json = {};
+  try {
+    const f2 = function (err, rows) {
+      if (rows) {
+        let customTimeIncom = 0;
+        rows.forEach((row) => {
+          customTimeIncom += row.price;
+        });
+        json.income = customTimeIncom;
+      } else {
+        json.income = 0;
+      }
+      res.status(200)
+        .json(json);
+    };
+    const f1 = function (err, rows) {
+      json.userCount = rows[0].count;
+      db.getPlanCustomIncome(req.params.providerAddress, req.params.planIndex, f2);
+    };
+    db.getPlanUsersCount(req.params.providerAddress, req.params.planIndex, f1);
+  } catch (err) {
+    res.status(500)
+      .json(err);
+  }
+}
+
+async function getPlanCustomIncome(req, res) {
+  const json = {};
+  const f3 = function (err, rows) {
+    let customTimeIncom = 0;
+    rows.forEach((row) => {
+      if (row.start_time > req.params.start && row.start_time < req.params.finish) {
+        customTimeIncom += row.price;
+      }
+    });
+    json.customTimeIncom = customTimeIncom;
+    res.status(200)
+      .json(json);
+  };
+  db.getPlanCustomIncome(req.params.providerAddress, req.params.planIndex, f3);
+}
+
+async function getUsers(req, res) {
+  await db.getUsers(req.params.providerAddress, res);
+}
+
+async function getUsersOfPlan(req, res) {
+  await db.getUsersOfPlan(req.params.providerAddress, req.params.planIndex, res);
+}
+
+async function addUser(req, res) {
+  await db.addUser(req.params.userAddress);
+  res.status(200)
+    .json('');
+}
+
+async function addProvider(req, res) {
+  await db.addProvider(req.params.providerAddress);
+  res.status(200)
+    .json('');
+}
+
+async function addProduct(req, res) {
+  await db.addProduct(req.params.providerAddress, req.params.planIndex);
+  res.status(200)
+    .json('');
+}
+
+async function addSubscription(req, res) {
+  await db.addSubscription(
+    req.params.userAddress,
+    req.params.providerAddress,
+    req.params.planIndex,
+    req.params.startTime,
+    req.params.duration,
+    req.params.price,
+  );
+  res.status(200)
+    .json('');
 }
 
 module.exports = {
@@ -238,8 +421,19 @@ module.exports = {
   isUsernameAvailable,
   getUsername,
   retrieveDataWithUsername,
+  getSha2,
   retrieveWholeDataWithUsername,
   getPlanData,
+  getPlanIncome,
   getPlanCharacteristics,
   getPlanLength,
+  getProviderData,
+  getProviderCustomIncome,
+  getPlanCustomIncome,
+  getUsers,
+  getUsersOfPlan,
+  addUser,
+  addProvider,
+  addProduct,
+  addSubscription,
 };

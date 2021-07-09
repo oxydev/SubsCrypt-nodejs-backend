@@ -1,6 +1,7 @@
 global.window = {};
 // API boilerplate
 const express = require('express');
+const cors = require('cors');
 
 const app = express();
 const morgan = require('morgan');
@@ -11,7 +12,9 @@ const docs = require('./docs');
 // Logging
 const logger = require('./logger');
 
+require('./eventManager/eventListener');
 // Config
+app.use(cors());
 
 // Set up middleware for request parsing, logging, etc.
 app.use(express.json());
