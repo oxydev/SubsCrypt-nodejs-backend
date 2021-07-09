@@ -8,7 +8,6 @@ subscrypt.getEvents((events) => {
     const { event } = record;
 
     const abi = await subscrypt.abiInstance();
-    console.log(abi);
     if (event.method === 'ContractEmitted') {
       const eventDecoded = abi.decodeEvent(event.data[1]);
       console.log('new event :', eventDecoded.event.identifier);
