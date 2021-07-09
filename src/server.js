@@ -12,7 +12,7 @@ const docs = require('./docs');
 // Logging
 const logger = require('./logger');
 
-// require('./eventManager/eventListener');
+require('./eventManager/eventListener');
 // Config
 app.use(cors());
 
