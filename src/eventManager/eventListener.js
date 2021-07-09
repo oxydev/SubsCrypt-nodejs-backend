@@ -1,9 +1,6 @@
 const subscrypt = require('@oxydev/subscrypt');
 const db = require('../databaseWrapper/database');
 
-db.initDb();
-
-subscrypt.config.address = '5HrHYMF5o1Jxdr7gQsQGkGuUJTYYLKchaL8pSXg7RUieBwND';
 subscrypt.getEvents((events) => {
   // Loop through the Vec<EventRecord>
   events.forEach(async (record) => {
@@ -13,6 +10,7 @@ subscrypt.getEvents((events) => {
     const abi = await subscrypt.abiInstance();
     if (event.method === 'ContractEmitted') {
       const eventDecoded = abi.decodeEvent(event.data[1]);
+      console.log('new event :', eventDecoded.event.identifier);
       if (eventDecoded.event.identifier === 'AddPlanEvent') { // owner(address) , duration(int) , price(int)
         db.addProvider(eventDecoded.args[0].toString());
         db.addProduct(eventDecoded.args[0].toString(), eventDecoded.args[3].toNumber());

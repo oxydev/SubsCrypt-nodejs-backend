@@ -225,6 +225,22 @@ async function checkAuthWithUsername(req, res, next) {
   }
 }
 
+async function getSha2(req, res, next) {
+  try {
+    await subscrypt.getSha2(req.query.string)
+      .then((resp) => {
+        const arr = refactorRes(resp);
+        res.status(arr[0])
+          .json(arr[1]);
+      })
+      .catch(() => {
+        next(errors.newHttpError(404, 'Wrong Args'));
+      });
+  } catch {
+    next(errors.newHttpError(404, 'Wrong Args'));
+  }
+}
+
 async function checkAuth(req, res, next) {
   try {
     await subscrypt.checkAuth(req.query.userAddress, req.query.providerAddress, req.query.phrase)
@@ -405,6 +421,7 @@ module.exports = {
   isUsernameAvailable,
   getUsername,
   retrieveDataWithUsername,
+  getSha2,
   retrieveWholeDataWithUsername,
   getPlanData,
   getPlanIncome,

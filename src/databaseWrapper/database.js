@@ -43,16 +43,21 @@ function addProduct(providerAddress, planIndex, fallback = undefined) {
     + ' join providers on provider_id = providers.ID \n'
     + ' where provider_address = ? and plan_index = ?';
   db.get(query, [providerAddress, planIndex], (err, resp) => {
-    if (resp === undefined) {
-      const insert = 'INSERT OR IGNORE INTO products (provider_id, plan_index) VALUES ((SELECT id from providers WHERE provider_address=?), ?)';
-      if (fallback === undefined) {
-        db.run(insert, [providerAddress, planIndex]);
-      } else {
-        db.run(insert, [providerAddress, planIndex], fallback);
+    const q = 'select provider_address from providers where provider_address = ?';
+    db.get(q, [providerAddress], (er, response) => {
+      if (response) {
+        if (resp === undefined) {
+          const insert = 'INSERT OR IGNORE INTO products (provider_id, plan_index) VALUES ((SELECT id from providers WHERE provider_address=?), ?)';
+          if (fallback === undefined) {
+            db.run(insert, [providerAddress, planIndex]);
+          } else {
+            db.run(insert, [providerAddress, planIndex], fallback);
+          }
+        } else {
+          fallback();
+        }
       }
-    } else {
-      fallback();
-    }
+    });
   });
 }
 
@@ -152,6 +157,7 @@ function updateProductDescription(providerAddress, name, planIndex, description)
       + ' where provider_id = (SELECT ID from providers WHERE provider_address = (?)) and plan_index = (?)';
     db.run(insert, [name, description, providerAddress, planIndex]);
   }
+
   addProduct(providerAddress, planIndex, fallback);
 }
 
@@ -173,7 +179,8 @@ function getProviderProfile(providerAddress, res) {
       const path = providersPath + row.profile_pic_id;
       getPic(path, res);
     } else {
-      res.status(200).json();
+      res.status(200)
+        .json();
     }
   });
 }

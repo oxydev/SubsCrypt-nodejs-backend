@@ -11,6 +11,7 @@ async function setProviderProfile(req, res) {
     );
     res.send(req.file.filename);
   } catch (err) {
+    console.log(err);
     res.send(400);
   }
 }

@@ -16,6 +16,7 @@ const routes = {
   userCheckAuthWithUsername: '/userCheckAuth/:username',
   providerCheckAuthWithUsername: '/providerCheckAuth/:username',
   checkAuth: '/checkAuth',
+  getSha2: '/getSha2',
   checkAuthWithUsername: '/checkAuth/:username',
   retrieveWholeDataWithUsername: '/retrieveDataWithUsername',
   retrieveDataWithUsername: '/retrieveDataWithUsername/:providerAddress',
