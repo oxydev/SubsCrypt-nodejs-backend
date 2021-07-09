@@ -8,3 +8,4 @@ coverage
 /package-lock.json
 .vscode/launch.json
 *.sqlite
+/uploads/
