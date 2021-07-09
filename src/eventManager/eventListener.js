@@ -1,8 +1,6 @@
 const subscrypt = require('@oxydev/subscrypt');
 const db = require('../databaseWrapper/database');
 
-db.initDb();
-
 subscrypt.getEvents((events) => {
   // Loop through the Vec<EventRecord>
   events.forEach(async (record) => {
@@ -10,6 +8,7 @@ subscrypt.getEvents((events) => {
     const { event } = record;
 
     const abi = await subscrypt.abiInstance();
+    console.log(abi);
     if (event.method === 'ContractEmitted') {
       const eventDecoded = abi.decodeEvent(event.data[1]);
       console.log('new event :', eventDecoded.event.identifier);
