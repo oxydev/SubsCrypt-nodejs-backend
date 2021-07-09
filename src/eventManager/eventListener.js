@@ -3,7 +3,6 @@ const db = require('../databaseWrapper/database');
 
 db.initDb();
 
-subscrypt.config.address = '5HrHYMF5o1Jxdr7gQsQGkGuUJTYYLKchaL8pSXg7RUieBwND';
 subscrypt.getEvents((events) => {
   // Loop through the Vec<EventRecord>
   events.forEach(async (record) => {
