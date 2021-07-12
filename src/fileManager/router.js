@@ -5,7 +5,7 @@ const multer = require('multer');
 const index = require('./index');
 
 const uploadProviders = multer({
-  dest: 'uploads/uploadProviders/',
+  dest: '/root/SubsCrypt-nodejs-backend/uploads/uploadProviders/',
   limits: { fileSize: 300000 },
 });
 
