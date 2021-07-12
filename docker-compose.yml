@@ -3,3 +3,5 @@ services:
   node:
     network_mode: host
     image: "oxydev/subscrypt_nodejs:latest"
+    volumes:
+      - /root/upload:/app/uploads

@@ -6,13 +6,8 @@ const index = require('./index');
 
 const uploadProviders = multer({
   dest: 'uploads/uploadProviders/',
-  limits: { fileSize: 300000 },
+  limits: { fileSize: 3000000 },
 });
-
-// const uploadProducts = multer({
-//   dest: 'uploads/uploadProducts/',
-//   limits: { fileSize: 1000000 },
-// });
 
 router.post('/newProviderRegister', uploadProviders.single('profile'), index.setProviderProfile);
 router.patch('/updateProviderPic', uploadProviders.single('profile'), index.updateProviderProfile);
