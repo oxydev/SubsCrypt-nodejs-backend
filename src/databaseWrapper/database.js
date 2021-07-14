@@ -69,7 +69,7 @@ function addSubscription(userAddress, providerAddress, planIndex, startTime, dur
 }
 
 function getUsers(providerAddress, res) {
-  const insert = 'SELECT user_address, finish_time, provider_address, plan_index from users \n'
+  const insert = 'SELECT user_address, start_time, duration, provider_address, plan_index from users \n'
     + 'join _product_user_relationships on users.id = user_reference\n'
     + 'join products on _product_user_relationships.product_reference = products.ID\n'
     + 'join providers on provider_id = providers.ID \n'
@@ -118,7 +118,7 @@ function getProviderIncome(providerAddress, f2) {
 }
 
 function getUsersOfPlan(providerAddress, planIndex, res) {
-  const insert = 'SELECT user_address, finish_time, provider_address, plan_index from users \n'
+  const insert = 'SELECT user_address, start_time, duration, provider_address, plan_index from users \n'
     + 'join _product_user_relationships on users.id = user_reference\n'
     + 'join products on _product_user_relationships.product_reference = products.ID\n'
     + 'join providers on provider_id = providers.ID \n'
