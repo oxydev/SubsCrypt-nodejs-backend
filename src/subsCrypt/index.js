@@ -289,7 +289,7 @@ async function userCheckAuth(req, res, next) {
     next(errors.newHttpError(404, 'Wrong Args'));
   }
 }
-
+// todo bad smell
 async function getProviderData(req, res) {
   const json = {};
   try {
