@@ -294,9 +294,14 @@ async function getProviderData(req, res) {
   const json = {};
   try {
     const f2 = function (err, row) {
-      json.income = row.total_income;
-      res.status(200)
-        .json(json);
+      if (row) {
+        json.income = row.total_income;
+        res.status(200)
+          .json(json);
+      } else {
+        res.status(404)
+          .json({ message: 'there is no such provider' });
+      }
     };
     const f1 = function (err, rows) {
       json.userCount = rows[0].count;
@@ -312,16 +317,20 @@ async function getProviderData(req, res) {
 async function getProviderCustomIncome(req, res) {
   const json = {};
   const f3 = function (err, rows) {
-    let customTimeIncom = 0;
-    rows.forEach((row) => {
-      if (row.start_time > req.params.start && row.start_time < req.params.finish) {
-        customTimeIncom += row.price;
-      }
-    });
-
-    json.customTimeIncom = customTimeIncom;
-    res.status(200)
-      .json(json);
+    if (rows.length > 0) {
+      let customTimeIncom = 0;
+      rows.forEach((row) => {
+        if (row.start_time > req.params.start && row.start_time < req.params.finish) {
+          customTimeIncom += row.price;
+        }
+      });
+      json.customTimeIncom = customTimeIncom;
+      res.status(200)
+        .json(json);
+    } else {
+      res.status(404)
+        .json({ message: 'there is no such provider' });
+    }
   };
   db.getProviderCustomIncome(req.params.providerAddress, f3);
 }
@@ -330,17 +339,18 @@ async function getPlanIncome(req, res) {
   const json = {};
   try {
     const f2 = function (err, rows) {
-      if (rows) {
+      if (rows.length > 0) {
         let customTimeIncom = 0;
         rows.forEach((row) => {
           customTimeIncom += row.price;
         });
         json.income = customTimeIncom;
+        res.status(200)
+          .json(json);
       } else {
-        json.income = 0;
+        res.status(404)
+          .json({ message: 'there is no such provider or plan' });
       }
-      res.status(200)
-        .json(json);
     };
     const f1 = function (err, rows) {
       json.userCount = rows[0].count;
