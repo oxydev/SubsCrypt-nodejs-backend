@@ -4,8 +4,6 @@ FROM node:12-alpine
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-RUN --mount=target=/usr/src/app/uploads/uploadProviders,type=bind,source=uploads/uploadProviders
-
 # copying all the files from your file system to container file system
 COPY . .
 
