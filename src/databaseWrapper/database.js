@@ -179,8 +179,8 @@ function getProviderProfile(providerAddress, res) {
       const path = providersPath + row.profile_pic_id;
       getPic(path, res);
     } else {
-      res.status(200)
-        .json();
+      res.status(404)
+        .json({ message: 'there is no such provider' });
     }
   });
 }
@@ -195,20 +195,12 @@ function getProviderDescription(providerAddress, res) {
           name: row.providerName,
         });
     } else {
-      res.status(200)
-        .json();
+      res.status(404)
+        .json({ message: 'there is no such provider' });
     }
   });
 }
 
-// function getUserProfile(providerAddress, res) {
-//   const insert = 'select profile_id from users where user_address = (?)';
-//   return db.get(insert, [providerAddress], (error, row) => {
-//     const path = usersPath + row.profile_id;
-//     getPic(path, res);
-//   });
-// }
-//
 function getProductDescription(providerAddress, planIndex, res) {
   const insert = 'select products.description, planName from products'
     + ' join providers on provider_id = providers.ID \n'
@@ -221,8 +213,8 @@ function getProductDescription(providerAddress, planIndex, res) {
           name: row.planName,
         });
     } else {
-      res.status(200)
-        .json();
+      res.status(404)
+        .json({ message: 'there is no such provider' });
     }
   });
 }
