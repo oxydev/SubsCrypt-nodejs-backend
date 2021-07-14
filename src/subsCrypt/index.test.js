@@ -72,7 +72,7 @@ describe('Getting Data Test', () => {
   };
 
   const isResExpected = (res, object) => {
-    expect(res.body).to.deep.equal(object);
+    expect(res).to.deep.equal(object);
   };
 
   const isResObject = (res) => {
@@ -122,7 +122,7 @@ describe('Getting Data Test', () => {
     const expected = itObject.expectedResult;
     console.log(itObject.testIsStr);
     if (expected !== undefined && itObject.testIsStr === undefined) {
-      isResExpected(result, isFunction(expected) ? expected() : expected);
+      isResExpected(result.body, isFunction(expected) ? expected() : expected);
     } else if (expected !== undefined) {
       isResString(result, expected);
     }
@@ -250,7 +250,7 @@ describe('Getting Data Test', () => {
           providerAddress: userWholeDatum.provider,
         });
         const result = await getResult(routes.checkAuth, responseCodes.success, query);
-        isResExpected(result, true);
+        isResExpected(result.body, true);
       }
     });
 
@@ -259,7 +259,7 @@ describe('Getting Data Test', () => {
         const route = replaceLast(paramsNames.username, testMetaData.username, routes.userCheckAuthWithUsername);
         const query = getQuery({ password: testMetaData.passWord, providerAddress: userWholeDatum.provider });
         const result = await getResult(route, responseCodes.success, query);
-        isResExpected(result, true);
+        isResExpected(result.body, true);
       }
     });
   });
@@ -273,7 +273,8 @@ describe('Getting Data Test', () => {
           planIndex: index,
         });
         const result = await getResult(routes.checkSubscription, responseCodes.success, query);
-        isResExpected(result || true, true);
+        console.log(result);
+        isResExpected(result.body || true, true);
       }
     });
 
@@ -282,7 +283,7 @@ describe('Getting Data Test', () => {
         const route = replaceLast(paramsNames.username, testMetaData.username, routes.checkSubscriptionWithUsername);
         const query = getQuery({ providerAddress: userWholeDatum.provider, planIndex: index });
         const result = await getResult(route, responseCodes.success, query);
-        isResExpected(result || true, true);
+        isResExpected(result.body || true, true);
       }
     });
   });
