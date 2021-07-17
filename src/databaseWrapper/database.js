@@ -1,12 +1,12 @@
-const fs = require('fs');
 const { DataTypes } = require('sequelize');
 const { Sequelize } = require('sequelize');
 
-const DBSOURCE = '../../db.sqlite';
+const DBSOURCE = './db.sqlite';
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
   storage: DBSOURCE,
+  logging: false,
 });
 
 const User = sequelize.define('User', {
@@ -24,6 +24,7 @@ const User = sequelize.define('User', {
 }, {
   timestamps: false,
 });
+
 const Provider = sequelize.define('Provider', {
   // Model attributes are defined here
   id: {
@@ -46,6 +47,7 @@ const Provider = sequelize.define('Provider', {
 }, {
   timestamps: false,
 });
+
 const Subscription = sequelize.define('Subscription', {
   start_time: DataTypes.INTEGER,
   duration: DataTypes.INTEGER,
@@ -53,6 +55,7 @@ const Subscription = sequelize.define('Subscription', {
 }, {
   timestamps: false,
 });
+
 const Plan = sequelize.define('Plan', {
   // Model attributes are defined here
   id: {
@@ -101,12 +104,11 @@ async function addProvider(providerAddress) {
 }
 
 async function findProvider(providerAddress) {
-  const provider = await Provider.findOne({
+  return Provider.findOne({
     where: {
       provider_address: providerAddress,
     },
   });
-  return provider;
 }
 
 async function findPlan(providerAddress, planIndex) {
@@ -133,11 +135,18 @@ async function addPlan(providerAddress, planIndex, name, description) {
       planName: name,
       description,
     });
-    plan.setProvider(provider);
+    await plan.setProvider(provider);
   }
 }
 
-async function addSubscription(userAddress, providerAddress, planIndex, startTime, duration, price) {
+async function addSubscription(
+  userAddress,
+  providerAddress,
+  planIndex,
+  startTime,
+  duration,
+  price,
+) {
   const provider = await findProvider(providerAddress);
   const plan = await findPlan(providerAddress, planIndex);
   const user = await User.findOne({
@@ -177,7 +186,7 @@ async function getUsers(providerAddress) {
 
   for (let i = 0; i < u.Plans.length; i += 1) {
     const p = u.Plans[i];
-    for (let j = 0; j < p.Subscriptions.length; j++) {
+    for (let j = 0; j < p.Subscriptions.length; j += 1) {
       subscriptions.push({
         plan_index: p.plan_index,
         start_time: p.Subscriptions[j].start_time,
@@ -191,14 +200,14 @@ async function getUsers(providerAddress) {
   return subscriptions;
 }
 
-function getUsersCount(providerAddress) {
+async function getUsersCount(providerAddress) {
   return getUsers(providerAddress).length;
 }
 
 async function getProviderCustomIncome(providerAddress, startTime, finishTime) {
   const subscriptions = await getUsers(providerAddress);
   let income = 0;
-  for (let j = 0; j < subscriptions.length; j+=1) {
+  for (let j = 0; j < subscriptions.length; j += 1) {
     const subscription = subscriptions[j];
     if (subscription.start_time >= startTime && subscription.start_time < finishTime) {
       income += subscription.price;
@@ -207,8 +216,8 @@ async function getProviderCustomIncome(providerAddress, startTime, finishTime) {
   return income;
 }
 
-function getProviderIncome(providerAddress) {
-  const provider = findProvider(providerAddress);
+async function getProviderIncome(providerAddress) {
+  const provider = await findProvider(providerAddress);
   return provider.total_income;
 }
 
@@ -232,7 +241,7 @@ async function getUsersOfPlan(providerAddress, planIndex) {
 
   const subscriptions = [];
 
-  for (let j = 0; j < p.Subscriptions.length; j+=1) {
+  for (let j = 0; j < p.Subscriptions.length; j += 1) {
     subscriptions.push({
       plan_index: p.plan_index,
       start_time: p.Subscriptions[j].start_time,
@@ -249,7 +258,7 @@ async function getPlanCustomIncome(providerAddress, planIndex, startTime, finish
   const subscriptions = await getUsersOfPlan(providerAddress, planIndex);
 
   let income = 0;
-  for (let j = 0; j < subscriptions.length; j+=1) {
+  for (let j = 0; j < subscriptions.length; j += 1) {
     const subscription = subscriptions[j];
     if (subscription.start_time >= startTime && subscription.start_time < finishTime) {
       income += subscription.price;
@@ -258,8 +267,18 @@ async function getPlanCustomIncome(providerAddress, planIndex, startTime, finish
   return income;
 }
 
+async function getPlanIncome(providerAddress, planIndex) {
+  const subscriptions = await getUsersOfPlan(providerAddress, planIndex);
+  let income = 0;
+  for (let j = 0; j < subscriptions.length; j += 1) {
+    const subscription = subscriptions[j];
+    income += subscription.price;
+  }
+  return income;
+}
+
 function getPlanUsersCount(providerAddress, planIndex) {
-  return getUsers(providerAddress, planIndex).length;
+  return getUsersOfPlan(providerAddress, planIndex).length;
 }
 
 async function setProviderProfile(providerAddress, description, name, fileID) {
@@ -279,7 +298,6 @@ async function updateProductDescription(providerAddress, name, planIndex, descri
   await addPlan(providerAddress, planIndex, name, description);
 }
 
-
 async function getProviderProfile(providerAddress) {
   const provider = await findProvider(providerAddress);
   return provider.profile_pic_id;
@@ -287,12 +305,15 @@ async function getProviderProfile(providerAddress) {
 
 async function getProviderDescription(providerAddress) {
   const provider = await findProvider(providerAddress);
-  return (provider.description, provider.providerName);
+  return [
+    provider.description != null ? provider.description : null,
+    provider.providerName != null ? provider.providerName : null,
+  ];
 }
 
 async function getProductDescription(providerAddress, planIndex) {
   const plan = await findPlan(providerAddress, planIndex);
-  return (plan.description, plan.planName);
+  return [plan.description, plan.planName];
 }
 
 module.exports = {
@@ -306,9 +327,10 @@ module.exports = {
   getProviderCustomIncome,
   getPlanUsersCount,
   getPlanCustomIncome,
+  getPlanIncome,
   addUser,
   addProvider,
-  addProduct: addPlan,
+  addPlan,
   addSubscription,
   getUsers,
   getUsersOfPlan,
