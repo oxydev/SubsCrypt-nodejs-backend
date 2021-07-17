@@ -7,9 +7,9 @@ async function setProviderProfile(req, res) {
       req.body.providerAddress,
       req.body.description,
       req.body.providerName,
-      req.file.filename,
+      req.file ? req.file.filename : null,
     );
-    res.send(req.file.filename);
+    res.status(200).send('OK');
   } catch (err) {
     console.log(err);
     res.send(400);
@@ -25,7 +25,7 @@ async function updateProviderProfile(req, res) {
             req.body.providerAddress,
             req.body.description,
             req.body.providerName,
-            req.file.filename,
+            req.file ? req.file.filename : null,
           );
           res.send(req.file.filename);
         } else {

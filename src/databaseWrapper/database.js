@@ -1,222 +1,298 @@
-const sqlite3 = require('sqlite3')
-  .verbose();
 const fs = require('fs');
+const { DataTypes } = require('sequelize');
+const { Sequelize } = require('sequelize');
 
-const providersPath = 'uploads/uploadProviders/';
+const DBSOURCE = '../../db.sqlite';
 
-const DBSOURCE = 'db.sqlite';
-const db = new sqlite3.Database(DBSOURCE, (err) => {
-  if (err) {
-    throw err;
-  }
+const sequelize = new Sequelize({
+  dialect: 'sqlite',
+  storage: DBSOURCE,
 });
 
-function initDb() {
-  db.run('CREATE TABLE IF NOT EXISTS "users" ("ID" INTEGER,"user_address" TEXT UNIQUE ,PRIMARY KEY("id"))',
-    () => {
-    });
-  db.run('CREATE TABLE IF NOT EXISTS "providers" ("ID" INTEGER,"provider_address" TEXT UNIQUE, "profile_pic_id" TEXT UNIQUE,"providerName" TEXT, "description" TEXT,"total_income" INTEGER, PRIMARY KEY("ID"))',
-    () => {
-    });
-  db.run('CREATE TABLE IF NOT EXISTS "products" ("ID" INTEGER, "provider_id" INTEGER, "description" TEXT, "planName" TEXT, "plan_index" INTEGER, PRIMARY KEY("ID"),FOREIGN KEY("provider_id") REFERENCES "providers"("ID"))',
-    () => {
-    });
-  db.run('CREATE TABLE IF NOT EXISTS _product_user_relationships (user_reference INTEGER, product_reference INTEGER, "start_time" INTEGER , "duration" INTEGER, "price" INTEGER)',
-    () => {
-    });
+const User = sequelize.define('User', {
+  // Model attributes are defined here
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  user_address: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+}, {
+  timestamps: false,
+});
+const Provider = sequelize.define('Provider', {
+  // Model attributes are defined here
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  provider_address: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+  profile_pic_id: {
+    type: DataTypes.STRING,
+    unique: true,
+  },
+  providerName: DataTypes.STRING,
+  description: DataTypes.STRING,
+  total_income: DataTypes.INTEGER,
+}, {
+  timestamps: false,
+});
+const Subscription = sequelize.define('Subscription', {
+  start_time: DataTypes.INTEGER,
+  duration: DataTypes.INTEGER,
+  price: DataTypes.INTEGER,
+}, {
+  timestamps: false,
+});
+const Plan = sequelize.define('Plan', {
+  // Model attributes are defined here
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+
+  description: DataTypes.STRING,
+  planName: DataTypes.STRING,
+  plan_index: DataTypes.INTEGER,
+
+}, {
+  timestamps: false,
+});
+
+async function initDb() {
+  Plan.belongsTo(Provider);
+  Provider.hasMany(Plan);
+
+  Subscription.belongsTo(User);
+  User.hasMany(Subscription);
+
+  Subscription.belongsTo(Plan);
+  Plan.hasMany(Subscription);
+
+  await sequelize.sync();
 }
 
 initDb();
 
-function addUser(userAddress) {
-  const insert = 'INSERT OR IGNORE INTO users (user_address) VALUES (?)';
-  db.run(insert, [userAddress]);
+async function addUser(userAddress) {
+  await User.create({ user_address: userAddress });
 }
 
-function addProvider(providerAddress) {
-  const insert = 'INSERT OR IGNORE INTO providers (provider_address, total_income) VALUES (?, 0)';
-  db.run(insert, [providerAddress]);
-}
-
-function addProduct(providerAddress, planIndex, fallback = undefined) {
-  const query = 'select products.description, planName from products'
-    + ' join providers on provider_id = providers.ID \n'
-    + ' where provider_address = ? and plan_index = ?';
-  db.get(query, [providerAddress, planIndex], (err, resp) => {
-    const q = 'select provider_address from providers where provider_address = ?';
-    db.get(q, [providerAddress], (er, response) => {
-      if (response) {
-        if (resp === undefined) {
-          const insert = 'INSERT OR IGNORE INTO products (provider_id, plan_index) VALUES ((SELECT id from providers WHERE provider_address=?), ?)';
-          if (fallback === undefined) {
-            db.run(insert, [providerAddress, planIndex]);
-          } else {
-            db.run(insert, [providerAddress, planIndex], fallback);
-          }
-        } else {
-          fallback();
-        }
-      }
-    });
+async function addProvider(providerAddress) {
+  await Provider.findOrCreate({
+    where: {
+      provider_address: providerAddress,
+    },
+    defaults: {
+      provider_address: providerAddress,
+      total_income: 0,
+    },
   });
 }
 
-function addSubscription(userAddress, providerAddress, planIndex, startTime, duration, price) {
-  const insert = 'INSERT OR IGNORE INTO _product_user_relationships (user_reference, product_reference, start_time, duration, price) VALUES ((SELECT id from users WHERE user_address=?), (SELECT id from products WHERE provider_id = (SELECT id from providers WHERE provider_address=?) and plan_index=?), ?, ?, ?)';
-  db.run(insert, [userAddress, providerAddress, planIndex, startTime, duration, price]);
-  const increment = 'UPDATE providers SET total_income = total_income + ? WHERE provider_address = ?';
-  db.run(increment, [price, providerAddress]);
+async function findProvider(providerAddress) {
+  const provider = await Provider.findOne({
+    where: {
+      provider_address: providerAddress,
+    },
+  });
+  return provider;
 }
 
-function getUsers(providerAddress, res) {
-  const insert = 'SELECT user_address, start_time, duration, provider_address, plan_index from users \n'
-    + 'join _product_user_relationships on users.id = user_reference\n'
-    + 'join products on _product_user_relationships.product_reference = products.ID\n'
-    + 'join providers on provider_id = providers.ID \n'
-    + 'where provider_address = ?';
-  return db.all(insert, [providerAddress], (err, rows) => {
-    if (err) {
-      res.status(400)
-        .json({ error: err.message });
-      return;
-    }
-    res.json({
-      message: 'success',
-      data: rows,
-    });
+async function findPlan(providerAddress, planIndex) {
+  return Plan.findOne({
+    where: {
+      plan_index: planIndex,
+    },
+    include: [{
+      model: Provider,
+      where: {
+        provider_address: providerAddress,
+      },
+    }],
   });
 }
 
-function getUsersCount(providerAddress, fallback) {
-  const insert = 'SELECT count(*) AS count from users \n'
-    + 'join _product_user_relationships on users.id = user_reference\n'
-    + 'join products on _product_user_relationships.product_reference = products.ID\n'
-    + 'join providers on provider_id = providers.ID \n'
-    + 'where provider_address = ?';
-  db.all(insert, [providerAddress], fallback);
-}
-
-function getProviderCustomIncome(providerAddress, f3) {
-  const insert = 'select * from _product_user_relationships'
-    + ' join products on _product_user_relationships.product_reference = products.ID'
-    + ' join providers on provider_id = providers.ID'
-    + ' where provider_address = (?)';
-  db.all(insert, [providerAddress], f3);
-}
-
-function getPlanCustomIncome(providerAddress, planIndex, f3) {
-  const insert = 'select * from _product_user_relationships'
-    + ' join products on _product_user_relationships.product_reference = products.ID'
-    + ' join providers on provider_id = providers.ID'
-    + ' where provider_address = (?) and plan_index = ?';
-  db.all(insert, [providerAddress, planIndex], f3);
-}
-
-function getProviderIncome(providerAddress, f2) {
-  const insert = 'select total_income from providers where provider_address = (?)';
-  db.get(insert, [providerAddress], f2);
-}
-
-function getUsersOfPlan(providerAddress, planIndex, res) {
-  const insert = 'SELECT user_address, start_time, duration, provider_address, plan_index from users \n'
-    + 'join _product_user_relationships on users.id = user_reference\n'
-    + 'join products on _product_user_relationships.product_reference = products.ID\n'
-    + 'join providers on provider_id = providers.ID \n'
-    + 'where provider_address = ? and plan_index = ?';
-  return db.all(insert, [providerAddress, planIndex], (err, rows) => {
-    if (err) {
-      res.status(400)
-        .json({ error: err.message });
-      return;
-    }
-    res.json({
-      message: 'success',
-      data: rows,
+async function addPlan(providerAddress, planIndex, name, description) {
+  await addProvider(providerAddress);
+  const provider = await findProvider(providerAddress);
+  let plan = await findPlan(providerAddress, planIndex);
+  if (plan == null) {
+    plan = await Plan.create({
+      plan_index: planIndex,
+      planName: name,
+      description,
     });
-  });
-}
-
-function getPlanUsersCount(providerAddress, planIndex, fallback) {
-  const insert = 'SELECT count(*) as count from users \n'
-    + 'join _product_user_relationships on users.id = user_reference\n'
-    + 'join products on _product_user_relationships.product_reference = products.ID\n'
-    + 'join providers on provider_id = providers.ID \n'
-    + 'where provider_address = ? and plan_index = ?';
-  return db.all(insert, [providerAddress, planIndex], fallback);
-}
-
-function setProviderProfile(providerAddress, description, name, fileID) {
-  addProvider(providerAddress);
-  const insert = 'UPDATE providers SET  (profile_pic_id,providerName, description) = (?,?, ?) where provider_address = (?)';
-  db.run(insert, [fileID, name, description, providerAddress]);
-}
-
-function updateProductDescription(providerAddress, name, planIndex, description) {
-  function fallback() {
-    const insert = 'UPDATE products SET (planName, description) = (?, ?)'
-      + ' where provider_id = (SELECT ID from providers WHERE provider_address = (?)) and plan_index = (?)';
-    db.run(insert, [name, description, providerAddress, planIndex]);
-  }
-
-  addProduct(providerAddress, planIndex, fallback);
-}
-
-function getPic(path, res) {
-  try {
-    const file = fs.createReadStream(path);
-    const filename = (new Date()).toISOString();
-    res.setHeader('Content-Disposition', `attachment: filename="${filename}"`);
-    file.pipe(res);
-  } catch (err) {
-    res.sendStatus(200);
+    plan.setProvider(provider);
   }
 }
 
-function getProviderProfile(providerAddress, res) {
-  const insert = 'select profile_pic_id from providers where provider_address = (?)';
-  db.get(insert, [providerAddress], (error, row) => {
-    if (row) {
-      const path = providersPath + row.profile_pic_id;
-      getPic(path, res);
-    } else {
-      res.status(404)
-        .json({ message: 'there is no such provider' });
-    }
+async function addSubscription(userAddress, providerAddress, planIndex, startTime, duration, price) {
+  const provider = await findProvider(providerAddress);
+  const plan = await findPlan(providerAddress, planIndex);
+  const user = await User.findOne({
+    where: {
+      user_address: userAddress,
+    },
   });
+  provider.total_income += price;
+  const subscription = await Subscription.create({
+    start_time: startTime,
+    duration,
+    price,
+  });
+  // console.log(subscription);
+  await subscription.setUser(user);
+  await subscription.setPlan(plan);
+  await provider.save();
 }
 
-function getProviderDescription(providerAddress, res) {
-  const insert = 'select description, providerName from providers where provider_address = (?)';
-  db.get(insert, [providerAddress], (error, row) => {
-    if (row) {
-      res.status(200)
-        .json({
-          description: row.description,
-          name: row.providerName,
-        });
-    } else {
-      res.status(404)
-        .json({ message: 'there is no such provider' });
-    }
+async function getUsers(providerAddress) {
+  const u = await Provider.findOne({
+    where: {
+      provider_address: providerAddress,
+    },
+    include: [{
+      model: Plan,
+      include: [{
+        model: Subscription,
+        include: [{
+          model: User,
+        }],
+      }],
+    }],
   });
+
+  const subscriptions = [];
+
+  for (let i = 0; i < u.Plans.length; i += 1) {
+    const p = u.Plans[i];
+    for (let j = 0; j < p.Subscriptions.length; j++) {
+      subscriptions.push({
+        plan_index: p.plan_index,
+        start_time: p.Subscriptions[j].start_time,
+        duration: p.Subscriptions[j].duration,
+        provider_address: 'hadi',
+        user_address: p.Subscriptions[j].User.user_address,
+        price: p.Subscriptions[j].price,
+      });
+    }
+  }
+  return subscriptions;
 }
 
-function getProductDescription(providerAddress, planIndex, res) {
-  const insert = 'select products.description, planName from products'
-    + ' join providers on provider_id = providers.ID \n'
-    + ' where provider_address = ? and plan_index = ?';
-  return db.get(insert, [providerAddress, planIndex], (error, row) => {
-    if (row) {
-      res.status(200)
-        .json({
-          description: row.description,
-          name: row.planName,
-        });
-    } else {
-      res.status(404)
-        .json({ message: 'there is no such provider' });
+function getUsersCount(providerAddress) {
+  return getUsers(providerAddress).length;
+}
+
+async function getProviderCustomIncome(providerAddress, startTime, finishTime) {
+  const subscriptions = await getUsers(providerAddress);
+  let income = 0;
+  for (let j = 0; j < subscriptions.length; j+=1) {
+    const subscription = subscriptions[j];
+    if (subscription.start_time >= startTime && subscription.start_time < finishTime) {
+      income += subscription.price;
     }
+  }
+  return income;
+}
+
+function getProviderIncome(providerAddress) {
+  const provider = findProvider(providerAddress);
+  return provider.total_income;
+}
+
+async function getUsersOfPlan(providerAddress, planIndex) {
+  const p = await Plan.findOne({
+    where: {
+      plan_index: planIndex,
+    },
+    include: [{
+      model: Provider,
+      where: {
+        provider_address: providerAddress,
+      },
+    }, {
+      model: Subscription,
+      include: [{
+        model: User,
+      }],
+    }],
   });
+
+  const subscriptions = [];
+
+  for (let j = 0; j < p.Subscriptions.length; j+=1) {
+    subscriptions.push({
+      plan_index: p.plan_index,
+      start_time: p.Subscriptions[j].start_time,
+      duration: p.Subscriptions[j].duration,
+      provider_address: 'hadi',
+      user_address: p.Subscriptions[j].User.user_address,
+      price: p.Subscriptions[j].price,
+    });
+  }
+  return subscriptions;
+}
+
+async function getPlanCustomIncome(providerAddress, planIndex, startTime, finishTime) {
+  const subscriptions = await getUsersOfPlan(providerAddress, planIndex);
+
+  let income = 0;
+  for (let j = 0; j < subscriptions.length; j+=1) {
+    const subscription = subscriptions[j];
+    if (subscription.start_time >= startTime && subscription.start_time < finishTime) {
+      income += subscription.price;
+    }
+  }
+  return income;
+}
+
+function getPlanUsersCount(providerAddress, planIndex) {
+  return getUsers(providerAddress, planIndex).length;
+}
+
+async function setProviderProfile(providerAddress, description, name, fileID) {
+  await addProvider(providerAddress);
+  const provider = await Provider.findOne({
+    where: {
+      provider_address: providerAddress,
+    },
+  });
+  provider.providerName = name;
+  provider.description = description;
+  provider.profile_pic_id = fileID;
+  await provider.save();
+}
+
+async function updateProductDescription(providerAddress, name, planIndex, description) {
+  await addPlan(providerAddress, planIndex, name, description);
+}
+
+
+async function getProviderProfile(providerAddress) {
+  const provider = await findProvider(providerAddress);
+  return provider.profile_pic_id;
+}
+
+async function getProviderDescription(providerAddress) {
+  const provider = await findProvider(providerAddress);
+  return (provider.description, provider.providerName);
+}
+
+async function getProductDescription(providerAddress, planIndex) {
+  const plan = await findPlan(providerAddress, planIndex);
+  return (plan.description, plan.planName);
 }
 
 module.exports = {
@@ -232,7 +308,7 @@ module.exports = {
   getPlanCustomIncome,
   addUser,
   addProvider,
-  addProduct,
+  addProduct: addPlan,
   addSubscription,
   getUsers,
   getUsersOfPlan,

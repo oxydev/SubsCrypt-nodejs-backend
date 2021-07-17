@@ -1,6 +1,19 @@
 const subscrypt = require('@oxydev/subscrypt');
 const db = require('../databaseWrapper/database');
 const errors = require('../errors');
+const providersPath = 'uploads/uploadProviders/';
+
+
+function getPic(path, res) {
+  try {
+    const file = fs.createReadStream(path);
+    const filename = (new Date()).toISOString();
+    res.setHeader('Content-Disposition', `attachment: filename="${filename}"`);
+    file.pipe(res);
+  } catch (err) {
+    res.sendStatus(200);
+  }
+}
 
 const refactorRes = (response) => {
   const status = response.status === 'Fetched' ? 200 : 500;
