@@ -19,7 +19,8 @@ subscrypt.getEvents((events) => {
           eventDecoded.args[1].toNumber(),
           eventDecoded.args[3].toNumber(),
           eventDecoded.args[4].toNumber(),
-          eventDecoded.args[5].toNumber());
+          eventDecoded.args[5].toNumber(),
+          eventDecoded.args[6]);
       } else if (eventDecoded.event.identifier === 'ProviderRegisterEvent') { // providerAddress
         await db.addProvider(eventDecoded.args[0].toString());
       }

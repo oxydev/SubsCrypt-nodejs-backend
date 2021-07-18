@@ -52,6 +52,16 @@ const Subscription = sequelize.define('Subscription', {
   start_time: DataTypes.INTEGER,
   duration: DataTypes.INTEGER,
   price: DataTypes.INTEGER,
+  characteristics: {
+    type: Sequelize.STRING,
+    allowNull: false,
+    get() {
+      return this.getDataValue('characteristics').split(';');
+    },
+    set(val) {
+      this.setDataValue('characteristics', val.join(';'));
+    },
+  },
 }, {
   timestamps: false,
 });
@@ -146,6 +156,7 @@ async function addSubscription(
   startTime,
   duration,
   price,
+  characteristics,
 ) {
   const provider = await findProvider(providerAddress);
   const plan = await findPlan(providerAddress, planIndex);
@@ -159,6 +170,7 @@ async function addSubscription(
     start_time: startTime,
     duration,
     price,
+    characteristics,
   });
   // console.log(subscription);
   await subscription.setUser(user);
@@ -194,6 +206,7 @@ async function getUsers(providerAddress) {
         provider_address: 'hadi',
         user_address: p.Subscriptions[j].User.user_address,
         price: p.Subscriptions[j].price,
+        characteristics: p.Subscriptions[j].characteristics,
       });
     }
   }
