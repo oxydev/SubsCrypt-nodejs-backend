@@ -1,17 +1,37 @@
 const subscrypt = require('@oxydev/subscrypt');
+const fs = require('fs');
 const db = require('../databaseWrapper/database');
+
+const providersPath = 'uploads/uploadProviders/';
+
+function getPic(path, res) {
+  try {
+    if (fs.existsSync(path)) {
+      const file = fs.createReadStream(path);
+      const filename = (new Date()).toISOString();
+      res.setHeader('Content-Disposition', `attachment: filename="${filename}"`);
+      file.pipe(res);
+    } else {
+      res.status(404)
+        .send('the provider has not image');
+    }
+  } catch (err) {
+    res.status(404)
+      .send('the provider has not image');
+  }
+}
 
 async function setProviderProfile(req, res) {
   try {
-    db.setProviderProfile(
+    await db.setProviderProfile(
       req.body.providerAddress,
       req.body.description,
       req.body.providerName,
-      req.file.filename,
+      req.file ? req.file.filename : null,
     );
-    res.send(req.file.filename);
+    res.status(200)
+      .send('OK');
   } catch (err) {
-    console.log(err);
     res.send(400);
   }
 }
@@ -25,9 +45,9 @@ async function updateProviderProfile(req, res) {
             req.body.providerAddress,
             req.body.description,
             req.body.providerName,
-            req.file.filename,
+            req.file ? req.file.filename : null,
           );
-          res.send(req.file.filename);
+          res.status(200);
         } else {
           res.send('username or password is invalid!');
         }
@@ -42,8 +62,7 @@ async function updateProviderProfile(req, res) {
 
 async function updateProductProfile(req, res) {
   try {
-    console.log(req.body);
-    db.updateProductDescription(
+    await db.updateProductDescription(
       req.body.providerAddress,
       req.body.planName,
       req.body.planIndex,
@@ -56,15 +75,47 @@ async function updateProductProfile(req, res) {
 }
 
 async function getProviderProfile(req, res) {
-  await db.getProviderProfile(req.params.providerAddress, res);
+  try {
+    const value = await db.getProviderProfile(req.params.providerAddress);
+    getPic(providersPath + value, res);
+  } catch (e) {
+    res.status(400)
+      .json({
+        err: 'there is no such provider',
+      });
+  }
 }
 
 async function getProviderDescription(req, res) {
-  await db.getProviderDescription(req.params.providerAddress, res);
+  try {
+    const values = await db.getProviderDescription(req.params.providerAddress);
+    res.status(200)
+      .json({
+        description: values[0],
+        name: values[1],
+      });
+  } catch (e) {
+    res.status(400)
+      .json({
+        err: 'there is no such provider',
+      });
+  }
 }
 
 async function getProductDescription(req, res) {
-  await db.getProductDescription(req.params.providerAddress, req.params.planIndex, res);
+  try {
+    const values = await db.getProductDescription(req.params.providerAddress, req.params.planIndex);
+    res.status(200)
+      .json({
+        description: values[0],
+        name: values[1],
+      });
+  } catch (e) {
+    res.status(400)
+      .json({
+        err: 'there is no such provider',
+      });
+  }
 }
 
 module.exports = {
