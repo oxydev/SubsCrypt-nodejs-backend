@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { Sequelize } = require('sequelize');
 
-const DBSOURCE = './db.sqlite';
+const DBSOURCE = '/usr/src/app/db.sqlite';
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
@@ -25,7 +25,6 @@ const User = sequelize.define('User', {
 });
 
 const Provider = sequelize.define('Provider', {
-  // Model attributes are defined here
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -67,7 +66,6 @@ const Subscription = sequelize.define('Subscription', {
 });
 
 const Plan = sequelize.define('Plan', {
-  // Model attributes are defined here
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
