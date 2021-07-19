@@ -39,9 +39,6 @@ describe('Getting Data Test', () => {
   let userWholeData;
 
   before(() => {
-    // todo
-    // Init Timeout
-    // Init Contract Address
     config.address = testMetaData.contractAddress;
   });
 

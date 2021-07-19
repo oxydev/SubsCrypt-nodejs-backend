@@ -1,5 +1,4 @@
-const { DataTypes } = require('sequelize');
-const { Sequelize } = require('sequelize');
+const { DataTypes, Sequelize } = require('sequelize');
 
 const DBSOURCE = '/usr/src/app/db.sqlite';
 

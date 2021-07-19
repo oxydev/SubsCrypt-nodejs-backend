@@ -48,7 +48,6 @@ async function checkSubscriptionWithUsername(req, res, next) {
         } else {
           next(errors.newHttpError(arr[0], arr[1]));
         }
-        // todo check if fix in next version of contract
       })
       .catch(() => {
         next(errors.newHttpError(404, 'Wrong Args'));
