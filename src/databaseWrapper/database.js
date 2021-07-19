@@ -56,7 +56,8 @@ const Subscription = sequelize.define('Subscription', {
     type: Sequelize.STRING,
     allowNull: false,
     get() {
-      return this.getDataValue('characteristics').split(';');
+      return this.getDataValue('characteristics')
+        .split(';');
     },
     set(val) {
       this.setDataValue('characteristics', val.join(';'));
@@ -98,7 +99,14 @@ async function initDb() {
 initDb();
 
 async function addUser(userAddress) {
-  await User.create({ user_address: userAddress });
+  await User.findOrCreate({
+    where: {
+      user_address: userAddress,
+    },
+    defaults: {
+      user_address: userAddress,
+    },
+  });
 }
 
 async function addProvider(providerAddress) {
@@ -158,8 +166,16 @@ async function addSubscription(
   price,
   characteristics,
 ) {
+  await addProvider(providerAddress);
   const provider = await findProvider(providerAddress);
-  const plan = await findPlan(providerAddress, planIndex);
+  let plan = await findPlan(providerAddress, planIndex);
+  if (plan == null) {
+    plan = await Plan.create({
+      plan_index: planIndex,
+    });
+    await plan.setProvider(provider);
+  }
+  await addUser(userAddress);
   const user = await User.findOne({
     where: {
       user_address: userAddress,
@@ -172,7 +188,6 @@ async function addSubscription(
     price,
     characteristics,
   });
-  // console.log(subscription);
   await subscription.setUser(user);
   await subscription.setPlan(plan);
   await provider.save();
@@ -262,6 +277,7 @@ async function getUsersOfPlan(providerAddress, planIndex) {
       provider_address: 'hadi',
       user_address: p.Subscriptions[j].User.user_address,
       price: p.Subscriptions[j].price,
+      characteristics: p.Subscriptions[j].characteristics,
     });
   }
   return subscriptions;
