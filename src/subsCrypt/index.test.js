@@ -120,7 +120,6 @@ describe('Getting Data Test', () => {
       isResSuccess(result);
     }
     const expected = itObject.expectedResult;
-    console.log(itObject.testIsStr);
     if (expected !== undefined && itObject.testIsStr === undefined) {
       isResExpected(result.body, isFunction(expected) ? expected() : expected);
     } else if (expected !== undefined) {
