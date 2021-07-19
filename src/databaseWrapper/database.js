@@ -229,16 +229,15 @@ async function getUsers(providerAddress) {
   return subscriptions;
 }
 
-
 async function getProviderCustomIncome(providerAddress, startTime, finishTime) {
   const subscriptions = await getUsers(providerAddress);
   let income = 0;
-  for (let j = 0; j < subscriptions.length; j += 1) {
-    const subscription = subscriptions[j];
+  subscriptions.forEach((subscription) => {
     if (subscription.start_time >= startTime && subscription.start_time < finishTime) {
       income += subscription.price;
     }
-  }
+  });
+
   return income;
 }
 
@@ -322,7 +321,7 @@ async function setProviderProfile(providerAddress, description, name, fileID) {
 }
 
 async function updateProductDescription(providerAddress, name, planIndex, description) {
-  let plan = await addPlan(providerAddress, planIndex);
+  const plan = await addPlan(providerAddress, planIndex);
   plan.planName = name;
   plan.description = description;
   await plan.save();
@@ -342,8 +341,7 @@ async function getProviderDescription(providerAddress) {
 }
 
 async function getProductDescription(providerAddress, planIndex) {
-  const plan = 
-  await findPlan(providerAddress, planIndex);
+  const plan = await findPlan(providerAddress, planIndex);
 
   return [plan.description, plan.planName];
 }
