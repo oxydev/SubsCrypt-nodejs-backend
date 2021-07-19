@@ -6,10 +6,15 @@ const providersPath = 'uploads/uploadProviders/';
 
 function getPic(path, res) {
   try {
-    const file = fs.createReadStream(path);
-    const filename = (new Date()).toISOString();
-    res.setHeader('Content-Disposition', `attachment: filename="${filename}"`);
-    file.pipe(res);
+    if (fs.existsSync(path)) {
+      const file = fs.createReadStream(path);
+      const filename = (new Date()).toISOString();
+      res.setHeader('Content-Disposition', `attachment: filename="${filename}"`);
+      file.pipe(res);
+    } else {
+      res.status(404)
+        .send('the provider has not image');
+    }
   } catch (err) {
     res.status(404)
       .send('the provider has not image');
