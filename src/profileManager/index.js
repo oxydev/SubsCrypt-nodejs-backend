@@ -104,7 +104,7 @@ async function getProviderDescription(req, res) {
 
 async function getProductDescription(req, res) {
   try {
-    const values = await db.updateProductDescription(req.params.providerAddress);
+    const values = await db.getProductDescription(req.params.providerAddress, req.params.planIndex);
     res.status(200)
       .json({
         description: values[0],

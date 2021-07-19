@@ -2,12 +2,13 @@ const db = require('../databaseWrapper/database');
 
 async function getProviderData(req, res) {
   try {
-    const userCount = await db.getUsersCount(req.params.providerAddress);
+    const users = await db.getUsers(req.params.providerAddress);
+    const usersCount = users.length;
     const income = await db.getProviderIncome(req.params.providerAddress);
     res.status(200)
       .json({
         income,
-        userCount,
+        usersCount,
       });
   } catch (err) {
     res.status(404)

@@ -155,6 +155,7 @@ async function addPlan(providerAddress, planIndex, name, description) {
     });
     await plan.setProvider(provider);
   }
+  return plan;
 }
 
 async function addSubscription(
@@ -228,9 +229,6 @@ async function getUsers(providerAddress) {
   return subscriptions;
 }
 
-async function getUsersCount(providerAddress) {
-  return getUsers(providerAddress).length;
-}
 
 async function getProviderCustomIncome(providerAddress, startTime, finishTime) {
   const subscriptions = await getUsers(providerAddress);
@@ -324,7 +322,10 @@ async function setProviderProfile(providerAddress, description, name, fileID) {
 }
 
 async function updateProductDescription(providerAddress, name, planIndex, description) {
-  await addPlan(providerAddress, planIndex, name, description);
+  let plan = await addPlan(providerAddress, planIndex);
+  plan.planName = name;
+  plan.description = description;
+  await plan.save();
 }
 
 async function getProviderProfile(providerAddress) {
@@ -341,7 +342,9 @@ async function getProviderDescription(providerAddress) {
 }
 
 async function getProductDescription(providerAddress, planIndex) {
-  const plan = await findPlan(providerAddress, planIndex);
+  const plan = 
+  await findPlan(providerAddress, planIndex);
+
   return [plan.description, plan.planName];
 }
 
@@ -351,7 +354,6 @@ module.exports = {
   getProviderDescription,
   getProductDescription,
   setProviderProfile,
-  getUsersCount,
   getProviderIncome,
   getProviderCustomIncome,
   getPlanUsersCount,
