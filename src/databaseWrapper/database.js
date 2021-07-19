@@ -10,7 +10,6 @@ const sequelize = new Sequelize({
 });
 
 const User = sequelize.define('User', {
-  // Model attributes are defined here
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -212,20 +211,20 @@ async function getUsers(providerAddress) {
 
   const subscriptions = [];
 
-  for (let i = 0; i < u.Plans.length; i += 1) {
-    const p = u.Plans[i];
-    for (let j = 0; j < p.Subscriptions.length; j += 1) {
+  u.Plans.forEach((plan) => {
+    plan.Subscriptions.forEach((subscription) => {
       subscriptions.push({
-        plan_index: p.plan_index,
-        start_time: p.Subscriptions[j].start_time,
-        duration: p.Subscriptions[j].duration,
-        provider_address: 'hadi',
-        user_address: p.Subscriptions[j].User.user_address,
-        price: p.Subscriptions[j].price,
-        characteristics: p.Subscriptions[j].characteristics,
+        plan_index: plan.plan_index,
+        start_time: subscription.start_time,
+        duration: subscription.duration,
+        provider_address: providerAddress,
+        user_address: subscription.User.user_address,
+        price: subscription.price,
+        characteristics: subscription.characteristics,
       });
-    }
-  }
+    });
+  });
+
   return subscriptions;
 }
 
@@ -266,17 +265,17 @@ async function getUsersOfPlan(providerAddress, planIndex) {
 
   const subscriptions = [];
 
-  for (let j = 0; j < p.Subscriptions.length; j += 1) {
+  p.Subscriptions.forEach((subscription) => {
     subscriptions.push({
-      plan_index: p.plan_index,
-      start_time: p.Subscriptions[j].start_time,
-      duration: p.Subscriptions[j].duration,
-      provider_address: 'hadi',
-      user_address: p.Subscriptions[j].User.user_address,
-      price: p.Subscriptions[j].price,
-      characteristics: p.Subscriptions[j].characteristics,
+      plan_index: planIndex,
+      start_time: subscription.start_time,
+      duration: subscription.duration,
+      provider_address: providerAddress,
+      user_address: subscription.User.user_address,
+      price: subscription.price,
+      characteristics: subscription.characteristics,
     });
-  }
+  });
   return subscriptions;
 }
 
@@ -284,27 +283,22 @@ async function getPlanCustomIncome(providerAddress, planIndex, startTime, finish
   const subscriptions = await getUsersOfPlan(providerAddress, planIndex);
 
   let income = 0;
-  for (let j = 0; j < subscriptions.length; j += 1) {
-    const subscription = subscriptions[j];
+  subscriptions.forEach((subscription) => {
     if (subscription.start_time >= startTime && subscription.start_time < finishTime) {
       income += subscription.price;
     }
-  }
+  });
+
   return income;
 }
 
 async function getPlanIncome(providerAddress, planIndex) {
   const subscriptions = await getUsersOfPlan(providerAddress, planIndex);
   let income = 0;
-  for (let j = 0; j < subscriptions.length; j += 1) {
-    const subscription = subscriptions[j];
+  subscriptions.forEach((subscription) => {
     income += subscription.price;
-  }
+  });
   return income;
-}
-
-function getPlanUsersCount(providerAddress, planIndex) {
-  return getUsersOfPlan(providerAddress, planIndex).length;
 }
 
 async function setProviderProfile(providerAddress, description, name, fileID) {
@@ -354,7 +348,6 @@ module.exports = {
   setProviderProfile,
   getProviderIncome,
   getProviderCustomIncome,
-  getPlanUsersCount,
   getPlanCustomIncome,
   getPlanIncome,
   addUser,

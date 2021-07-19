@@ -35,7 +35,10 @@ async function getProviderCustomIncome(req, res) {
 
 async function getPlanIncome(req, res) {
   try {
-    const userCount = await db.getPlanUsersCount(req.params.providerAddress, req.params.planIndex);
+    const userCount = (await db.getUsersOfPlan(
+      req.params.providerAddress,
+      req.params.planIndex,
+    )).length;
     const income = await db.getPlanIncome(
       req.params.providerAddress,
       req.params.planIndex,
