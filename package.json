@@ -13,7 +13,7 @@
     "start": "npm run serve"
   },
   "dependencies": {
-    "@oxydev/subscrypt": "0.1.4",
+    "@oxydev/subscrypt": "oxydev/SubsCrypt-npm-library#update-contract-address",
     "config": "^3.3.6",
     "cors": "^2.8.5",
     "express": "4.17.1",
