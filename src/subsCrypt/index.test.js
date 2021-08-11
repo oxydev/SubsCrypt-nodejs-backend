@@ -26,13 +26,15 @@ describe('Errors - IT', () => {
 const { testMetaData, config } = require('@oxydev/subscrypt');
 const { routes } = require('./router');
 
+testMetaData.providerName = 'oxydev';
+testMetaData.contractAddress = '5CLff1WP6hnswYqSFZCSgEK1Xmef8UBunHxCzgnQVFXELHj1';
 testMetaData.plansData = [{
-  duration: '2,592,000,000',
+  duration: '7,776,000,000',
   price: '1,000,000,000,000',
   max_refund_permille_policy: '200',
   disabled: false,
 }];
-testMetaData.plansCharacteristic = [['address']];
+testMetaData.plansCharacteristic = [['email']];
 const paramsNames = {
   userAddress: 'address',
   username: 'username',
