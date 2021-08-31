@@ -338,6 +338,25 @@ async function getProductDescription(providerAddress, planIndex) {
   return [plan.description, plan.planName];
 }
 
+async function truncate() {
+  await User.destroy({
+    where: {},
+    force: true,
+  });
+  await Provider.destroy({
+    where: {},
+    force: true,
+  });
+  await Plan.destroy({
+    where: {},
+    force: true,
+  });
+  await Subscription.destroy({
+    where: {},
+    force: true,
+  });
+}
+
 module.exports = {
   getProviderProfile,
   updateProductDescription,
@@ -354,4 +373,10 @@ module.exports = {
   addSubscription,
   getUsers,
   getUsersOfPlan,
+  findProvider,
+  User,
+  Provider,
+  Subscription,
+  Plan,
+  truncate,
 };
