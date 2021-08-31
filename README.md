@@ -1,5 +1,5 @@
 # SubsCrypt-nodejs-backend
-<img src="https://oxydev.github.io/SubsCrypt-docs/images/logo2.png" width="500">
+<img src="https://oxydev.github.io/SubsCrypt-docs/images/logo.jpg" width="500">
 
 [![Test](https://github.com/oxydev/SubsCrypt-nodejs-backend/actions/workflows/node.js.yml/badge.svg)](https://github.com/oxydev/SubsCrypt-nodejs-backend/actions/workflows/node.js.yml)
 [![Docker Image CI](https://github.com/oxydev/SubsCrypt-nodejs-backend/actions/workflows/docker-hub-test.yml/badge.svg)](https://github.com/oxydev/SubsCrypt-nodejs-backend/actions/workflows/docker-hub-test.yml)
@@ -11,9 +11,9 @@ make it easier for developers to interact with smart contract getter functions. 
 # How to connect?
 You have to option right now, either you can run clone this project and run it on your own and also connect to a running instance of SubsCrypt smart contract( You can check the [SubsCrypt NPM package README](https://github.com/oxydev/SubsCrypt-npm-library))
 
-Or you can use our testing server in [here](http://206.189.154.160:3000).
+Or you can use our testing server in [here](https://api.subscrypt.io/).
 
-And also stay tunned for the updates and the official product.
+And also stay tuned for the updates and the official product.
 
 
 # How to Run(using npm)?
@@ -83,5 +83,5 @@ docker-compose up
 ```
 
 # Documentation
-This service is a RESTful API and you can see our api documentation [here](http://206.189.154.160:3000/subscrypt-doc).
+This service is a RESTful API and you can see our api documentation [here](https://api.subscrypt.io/subscrypt-doc).
 

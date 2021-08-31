@@ -5,7 +5,7 @@ module.exports = {
       description: 'Local Server',
     },
     {
-      url: 'http://206.189.154.160:3000/',
+      url: 'https://api.subscrypt.io/',
       description: 'Remote Server',
     },
   ],

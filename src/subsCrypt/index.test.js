@@ -26,6 +26,15 @@ describe('Errors - IT', () => {
 const { testMetaData, config } = require('@oxydev/subscrypt');
 const { routes } = require('./router');
 
+testMetaData.providerName = 'oxydev';
+testMetaData.contractAddress = '5CLff1WP6hnswYqSFZCSgEK1Xmef8UBunHxCzgnQVFXELHj1';
+testMetaData.plansData = [{
+  duration: '7,776,000,000',
+  price: '1,000,000,000,000',
+  max_refund_permille_policy: '200',
+  disabled: false,
+}];
+testMetaData.plansCharacteristic = [['email']];
 const paramsNames = {
   userAddress: 'address',
   username: 'username',
@@ -39,9 +48,6 @@ describe('Getting Data Test', () => {
   let userWholeData;
 
   before(() => {
-    // todo
-    // Init Timeout
-    // Init Contract Address
     config.address = testMetaData.contractAddress;
   });
 
@@ -272,7 +278,6 @@ describe('Getting Data Test', () => {
           planIndex: index,
         });
         const result = await getResult(routes.checkSubscription, responseCodes.success, query);
-        console.log(result);
         isResExpected(result.body || true, true);
       }
     });
