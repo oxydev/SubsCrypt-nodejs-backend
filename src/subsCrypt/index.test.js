@@ -14,16 +14,27 @@ describe('Errors - IT', () => {
       chai.request(server)
         .get('/nonexistentroute')
         .end((err, res) => {
-          expect(res).to.have.status(404);
-          expect(res.body).to.be.an('object');
-          expect(res.body.message).to.equal('not found');
+          expect(res)
+            .to
+            .have
+            .status(404);
+          expect(res.body)
+            .to
+            .be
+            .an('object');
+          expect(res.body.message)
+            .to
+            .equal('not found');
           done();
         });
     });
   });
 });
 
-const { testMetaData, config } = require('@oxydev/subscrypt');
+const {
+  testMetaData,
+  config
+} = require('@oxydev/subscrypt');
 const { routes } = require('./router');
 
 testMetaData.providerName = 'oxydev';
@@ -66,36 +77,53 @@ describe('Getting Data Test', () => {
   };
 
   const getItWithTimeout = (name, func) => {
-    it(name, func).timeout(testMetaData.REQUEST_TIMEOUT * 3);
+    it(name, func)
+      .timeout(testMetaData.REQUEST_TIMEOUT * 3);
   };
 
   const getResult = async (route, status, query) => {
     const res = await chai.request(server)
       .get(MAIN_ROUTE + route)
       .query(query);
-    expect(res).to.have.status(status);
+    expect(res)
+      .to
+      .have
+      .status(status);
     return res;
   };
 
   const isResExpected = (res, object) => {
-    expect(res).to.deep.equal(object);
+    expect(res)
+      .to
+      .deep
+      .equal(object);
   };
 
   const isResObject = (res) => {
-    expect(res.body).to.be.an('object');
+    expect(res.body)
+      .to
+      .be
+      .an('object');
   };
 
   const isResSuccess = (res) => {
-    expect(res.body.message).to.equal(testMetaData.SUCCESS_STATUS);
+    expect(res.body.message)
+      .to
+      .equal(testMetaData.SUCCESS_STATUS);
   };
 
   const isResString = (res, expected) => {
-    expect(res.body).to.equal(expected);
+    expect(res.body)
+      .to
+      .equal(expected);
   };
 
   const getQuery = ({
-    username = undefined, userAddress = undefined, password = undefined,
-    providerAddress = undefined, planIndex = undefined,
+    username = undefined,
+    userAddress = undefined,
+    password = undefined,
+    providerAddress = undefined,
+    planIndex = undefined,
   }) => {
     const query = {};
     if (username !== undefined) query.username = username;
@@ -108,9 +136,10 @@ describe('Getting Data Test', () => {
 
   const routeWithParams = (route, params) => {
     if (params) {
-      Object.keys(params).forEach((value) => {
-        route = replaceLast(paramsNames[value], isFunction(params[value]) ? params[value]() : params[value], route);
-      });
+      Object.keys(params)
+        .forEach((value) => {
+          route = replaceLast(paramsNames[value], isFunction(params[value]) ? params[value]() : params[value], route);
+        });
     }
     return route;
   };
@@ -136,13 +165,15 @@ describe('Getting Data Test', () => {
     }
   };
   const getTests = (testsObj) => {
-    Object.keys(testsObj).forEach((describeTest) => {
-      describe(`Check ${describeTest}`, () => {
-        Object.keys(testsObj[describeTest]).forEach((itTest) => {
-          getItWithTimeout(`${itTest} Test`, () => getItFunc(itTest, testsObj[describeTest][itTest]));
+    Object.keys(testsObj)
+      .forEach((describeTest) => {
+        describe(`Check ${describeTest}`, () => {
+          Object.keys(testsObj[describeTest])
+            .forEach((itTest) => {
+              getItWithTimeout(`${itTest} Test`, () => getItFunc(itTest, testsObj[describeTest][itTest]));
+            });
         });
       });
-    });
   };
 
   const testsObj = {
@@ -181,7 +212,10 @@ describe('Getting Data Test', () => {
     },
     'User Authentication': {
       userCheckAuth: {
-        query: { userAddress: testMetaData.userAddress, password: testMetaData.passWord },
+        query: {
+          userAddress: testMetaData.userAddress,
+          password: testMetaData.passWord
+        },
         expectedResult: true,
       },
       userCheckAuthWithUsername: {
@@ -194,7 +228,10 @@ describe('Getting Data Test', () => {
     },
     'Getting The Data Of The User': {
       retrieveWholeDataWithUsername: {
-        query: { username: testMetaData.username, password: testMetaData.passWord },
+        query: {
+          username: testMetaData.username,
+          password: testMetaData.passWord
+        },
         after: (result) => {
           userWholeData = result.body;
         },
@@ -203,13 +240,19 @@ describe('Getting Data Test', () => {
         params: {
           providerAddress: () => userWholeData[0].provider,
         },
-        query: { username: testMetaData.username, password: testMetaData.passWord },
+        query: {
+          username: testMetaData.username,
+          password: testMetaData.passWord
+        },
         expectedResult: () => userWholeData.filter((value) => value.provider === userWholeData[0].provider),
       },
     },
     'Auth Of Provider': {
       providerCheckAuth: {
-        query: { password: testMetaData.passWord, providerAddress: testMetaData.providerAddress },
+        query: {
+          password: testMetaData.passWord,
+          providerAddress: testMetaData.providerAddress
+        },
         expectedResult: true,
       },
       providerCheckAuthWithUsername: {
@@ -262,7 +305,10 @@ describe('Getting Data Test', () => {
     getItWithTimeout('should CheckAuth Using User Name', async () => {
       for (const userWholeDatum of userWholeData) {
         const route = replaceLast(paramsNames.username, testMetaData.username, routes.userCheckAuthWithUsername);
-        const query = getQuery({ password: testMetaData.passWord, providerAddress: userWholeDatum.provider });
+        const query = getQuery({
+          password: testMetaData.passWord,
+          providerAddress: userWholeDatum.provider
+        });
         const result = await getResult(route, responseCodes.success, query);
         isResExpected(result.body, true);
       }
@@ -285,7 +331,10 @@ describe('Getting Data Test', () => {
     getItWithTimeout('should Check Subscriptions With User Name', async () => {
       for (const [index, userWholeDatum] of userWholeData.entries()) {
         const route = replaceLast(paramsNames.username, testMetaData.username, routes.checkSubscriptionWithUsername);
-        const query = getQuery({ providerAddress: userWholeDatum.provider, planIndex: index });
+        const query = getQuery({
+          providerAddress: userWholeDatum.provider,
+          planIndex: index
+        });
         const result = await getResult(route, responseCodes.success, query);
         isResExpected(result.body || true, true);
       }

@@ -138,6 +138,7 @@ describe('database tests', () => {
       .equal('p1');
   });
   it('should create a subscription', async () => {
+    await db.addPlan('ProviderAddress1', 0, 'p0', 'plan0');
     await createSubscription();
   });
   it('should check provider income', async () => {
@@ -166,16 +167,20 @@ describe('database tests', () => {
     expect(await db.getProviderProfile('ProviderAddress1'))
       .to
       .equal('picture id');
-    const providerProfile = await db.getProviderDescription('ProviderAddress1');
+    let providerProfile = await db.getProviderDescription('ProviderAddress1');
     expect(providerProfile[0])
       .to
       .equal('des');
     expect(providerProfile[1])
       .to
       .equal('provider name');
+    await db.setProviderProfile('ProviderAddress1', null, null, 'picture id');
+    providerProfile = await db.getProviderDescription('ProviderAddress1');
+    expect(providerProfile[0])
+      .to
+      .equal(null);
+    expect(providerProfile[1])
+      .to
+      .equal(null);
   });
 });
-
-module.exports = {
-  truncate,
-};
