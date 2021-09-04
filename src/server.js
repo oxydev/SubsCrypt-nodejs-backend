@@ -9,6 +9,14 @@ const config = require('config');
 const swaggerUi = require('swagger-ui-express');
 const routes = require('./routes');
 const docs = require('./docs');
+const db = require('./databaseWrapper/database');
+
+const env = app.get('env');
+if (env === 'test') {
+  db.initDb('./db.sqlite');
+}
+db.initDb('/usr/src/app/db.sqlite');
+
 // Logging
 const logger = require('./logger');
 

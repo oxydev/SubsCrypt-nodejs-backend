@@ -6,6 +6,9 @@ const { expect } = chai;
 const db = require('./database');
 
 describe('database tests', () => {
+  before(async () => {
+    await db.initDb('./db.sqlite');
+  });
   beforeEach(async () => {
     await db.truncate();
   });
@@ -20,16 +23,16 @@ describe('database tests', () => {
       10,
       ['c1', 'c2'],
     );
-    expect(await db.Plan.count())
+    expect(await db.getPlanObject().count())
       .to
       .equal(1);
-    expect(await db.Provider.count())
+    expect(await db.getProviderObject().count())
       .to
       .equal(1);
-    expect(await db.User.count())
+    expect(await db.getUserObject().count())
       .to
       .equal(1);
-    expect(await db.Subscription.count())
+    expect(await db.getSubscriptionObject().count())
       .to
       .equal(1);
     expect(await db.getUsers('ProviderAddress1'))
@@ -62,11 +65,11 @@ describe('database tests', () => {
     await db.addUser(
       'Address1',
     );
-    const user = await db.User.findOne();
+    const user = await db.getUserObject().findOne();
     expect(user.user_address)
       .to
       .equal('Address1');
-    expect(await db.User.count())
+    expect(await db.getUserObject().count())
       .to
       .equal(1);
   });
@@ -74,24 +77,24 @@ describe('database tests', () => {
     await db.addUser(
       'Address1',
     );
-    const user = await db.User.findOne();
+    const user = await db.getUserObject().findOne();
     expect(user.user_address)
       .to
       .equal('Address1');
-    expect(await db.User.count())
+    expect(await db.getUserObject().count())
       .to
       .equal(1);
 
     await db.addUser(
       'Address1',
     );
-    expect(await db.User.count())
+    expect(await db.getUserObject().count())
       .to
       .equal(1);
     await db.addUser(
       'Address2',
     );
-    expect(await db.User.count())
+    expect(await db.getUserObject().count())
       .to
       .equal(2);
   });
@@ -99,7 +102,7 @@ describe('database tests', () => {
     await db.addProvider(
       'ProviderAddress1',
     );
-    const provider = await db.Provider.findOne();
+    const provider = await db.getProviderObject().findOne();
     expect(provider.provider_address)
       .to
       .equal('ProviderAddress1');
@@ -115,10 +118,10 @@ describe('database tests', () => {
   });
   it('should create a plan', async () => {
     await db.addPlan('ProviderAddress1', 0, 'plan1', 'hi this is plan 1');
-    expect(await db.Plan.count())
+    expect(await db.getPlanObject().count())
       .to
       .equal(1);
-    expect(await db.Provider.count())
+    expect(await db.getProviderObject().count())
       .to
       .equal(1);
     let description = await db.getProductDescription('ProviderAddress1', 0);
