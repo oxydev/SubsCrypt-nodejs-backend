@@ -94,6 +94,38 @@ async function retrieveDataWithUsername(req, res, next) {
   }
 }
 
+async function getWithdrawableAmount(req, res, next) {
+  try {
+    await subscrypt.getWithdrawableAmount(req.params.providerAddress)
+      .then((resp) => {
+        const arr = refactorRes(resp);
+        res.status(arr[0])
+          .json(arr[1]);
+      })
+      .catch(() => {
+        next(errors.newHttpError(404, 'Wrong Args'));
+      });
+  } catch {
+    next(errors.newHttpError(404, 'Wrong Args'));
+  }
+}
+
+async function getMoneyAddress(req, res, next) {
+  try {
+    await subscrypt.getMoneyAddress(req.params.providerAddress)
+      .then((resp) => {
+        const arr = refactorRes(resp);
+        res.status(arr[0])
+          .json(arr[1]);
+      })
+      .catch(() => {
+        next(errors.newHttpError(404, 'Wrong Args'));
+      });
+  } catch {
+    next(errors.newHttpError(404, 'Wrong Args'));
+  }
+}
+
 async function getPlanData(req, res, next) {
   try {
     await subscrypt.getPlanData(req.params.providerAddress, req.params.planIndex)
@@ -248,7 +280,7 @@ async function checkAuth(req, res, next) {
           .json(arr[1]);
       })
       .catch(() => {
-        next(errors.newHttpError(404, 'Wrong Args'));
+        next(errors.newHttpError(500, 'Wrong Args'));
       });
   } catch {
     next(errors.newHttpError(404, 'Wrong Args'));
@@ -301,6 +333,8 @@ module.exports = {
   isUsernameAvailable,
   getUsername,
   retrieveDataWithUsername,
+  getWithdrawableAmount,
+  getMoneyAddress,
   getSha2,
   retrieveWholeDataWithUsername,
   getPlanData,

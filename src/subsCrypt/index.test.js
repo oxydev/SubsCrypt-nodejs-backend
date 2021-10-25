@@ -1,11 +1,16 @@
 window = global;
-const { MAIN_ROUTE } = require('./router');
+
+const {
+  testMetaData,
+} = require('@oxydev/subscrypt');
 
 const chai = require('chai');
 
 const { expect } = chai;
 const chaiHttp = require('chai-http');
 const server = require('../server');
+
+const { MAIN_ROUTE } = require('./router');
 
 chai.use(chaiHttp);
 describe('Errors - IT', () => {
@@ -31,21 +36,27 @@ describe('Errors - IT', () => {
   });
 });
 
-const {
-  testMetaData,
-  config
-} = require('@oxydev/subscrypt');
 const { routes } = require('./router');
 
-testMetaData.providerName = 'oxydev';
-testMetaData.contractAddress = '5CLff1WP6hnswYqSFZCSgEK1Xmef8UBunHxCzgnQVFXELHj1';
+testMetaData.providerAddress = '5H7JNcUsERvHheAdHGnhBB2yZAUY5vT6fReNUVHhHt4n5M7B';
+testMetaData.subscriberAddress = '5C8bhNB4d5Umt95jJSEe6JYd9ZVFWL16uYyGk86zE7px47m6';
+testMetaData.providerName = 'hsgim';
+testMetaData.subscriberUsername = 'wzqc6';
+testMetaData.passWord = 'atvp8';
+testMetaData.plansCharacteristic = [['plan0']];
 testMetaData.plansData = [{
-  duration: '7,776,000,000',
+  duration: '86,400',
   price: '1,000,000,000,000',
-  max_refund_permille_policy: '200',
+  max_refund_permille_policy: '100',
   disabled: false,
+},
+{
+  disabled: true,
+  duration: '432,000',
+  max_refund_permille_policy: '150',
+  price: '10,000,000,000,000',
 }];
-testMetaData.plansCharacteristic = [['email']];
+
 const paramsNames = {
   userAddress: 'address',
   username: 'username',
@@ -57,10 +68,6 @@ const responseCodes = {
 };
 describe('Getting Data Test', () => {
   let userWholeData;
-
-  before(() => {
-    config.address = testMetaData.contractAddress;
-  });
 
   const isFunction = (functionToCheck) => functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
 
@@ -138,7 +145,8 @@ describe('Getting Data Test', () => {
     if (params) {
       Object.keys(params)
         .forEach((value) => {
-          route = replaceLast(paramsNames[value], isFunction(params[value]) ? params[value]() : params[value], route);
+          route = replaceLast(paramsNames[value],
+            isFunction(params[value]) ? params[value]() : params[value], route);
         });
     }
     return route;
@@ -198,29 +206,29 @@ describe('Getting Data Test', () => {
     'Username And UserAddress Validity': {
       isUsernameAvailable: {
         params: {
-          username: testMetaData.username,
+          username: testMetaData.subscriberUsername,
         },
         expectedResult: false,
       },
       getUsername: {
         params: {
-          userAddress: testMetaData.userAddress,
+          userAddress: testMetaData.subscriberAddress,
         },
         testIsStr: true,
-        expectedResult: testMetaData.username,
+        expectedResult: testMetaData.subscriberUsername,
       },
     },
     'User Authentication': {
       userCheckAuth: {
         query: {
-          userAddress: testMetaData.userAddress,
-          password: testMetaData.passWord
+          userAddress: testMetaData.subscriberAddress,
+          password: testMetaData.passWord,
         },
         expectedResult: true,
       },
       userCheckAuthWithUsername: {
         params: {
-          username: testMetaData.username,
+          username: testMetaData.subscriberUsername,
         },
         query: { password: testMetaData.passWord },
         expectedResult: true,
@@ -229,8 +237,8 @@ describe('Getting Data Test', () => {
     'Getting The Data Of The User': {
       retrieveWholeDataWithUsername: {
         query: {
-          username: testMetaData.username,
-          password: testMetaData.passWord
+          username: testMetaData.subscriberUsername,
+          password: testMetaData.passWord,
         },
         after: (result) => {
           userWholeData = result.body;
@@ -241,17 +249,18 @@ describe('Getting Data Test', () => {
           providerAddress: () => userWholeData[0].provider,
         },
         query: {
-          username: testMetaData.username,
-          password: testMetaData.passWord
+          username: testMetaData.subscriberUsername,
+          password: testMetaData.passWord,
         },
-        expectedResult: () => userWholeData.filter((value) => value.provider === userWholeData[0].provider),
+        expectedResult:
+          () => userWholeData.filter((value) => value.provider === userWholeData[0].provider),
       },
     },
     'Auth Of Provider': {
       providerCheckAuth: {
         query: {
           password: testMetaData.passWord,
-          providerAddress: testMetaData.providerAddress
+          providerAddress: testMetaData.providerAddress,
         },
         expectedResult: true,
       },
@@ -261,6 +270,13 @@ describe('Getting Data Test', () => {
         },
         query: { password: testMetaData.passWord },
         expectedResult: true,
+      },
+      getPlanData: {
+        params: {
+          providerAddress: testMetaData.providerAddress,
+          planIndex: '1',
+        },
+        expectedResult: testMetaData.plansData[1],
       },
     },
     'Getting Plan Data Funcs': {
@@ -284,6 +300,18 @@ describe('Getting Data Test', () => {
         },
         expectedResult: testMetaData.plansCharacteristic[0],
       },
+      getWithdrawableAmount: {
+        params: {
+          providerAddress: testMetaData.providerAddress,
+        },
+        expectedResult: '100,000,000,000',
+      },
+      getMoneyAddress: {
+        params: {
+          providerAddress: testMetaData.providerAddress,
+        },
+        expectedResult: testMetaData.providerAddress,
+      },
     },
   };
 
@@ -291,53 +319,69 @@ describe('Getting Data Test', () => {
 
   describe('Check Checking Auth Of User & Its Providers', () => {
     getItWithTimeout('should CheckAuth Using User Address', async () => {
-      for (const userWholeDatum of userWholeData) {
+      userWholeData.forEach((userWholeDatum) => {
         const query = getQuery({
-          userAddress: testMetaData.userAddress,
+          userAddress: testMetaData.subscriberAddress,
           password: testMetaData.passWord,
           providerAddress: userWholeDatum.provider,
         });
-        const result = await getResult(routes.checkAuth, responseCodes.success, query);
-        isResExpected(result.body, true);
-      }
+        getResult(routes.checkAuth, responseCodes.success, query)
+          .then((result) => {
+            isResExpected(result.body, true);
+          });
+      });
     });
 
     getItWithTimeout('should CheckAuth Using User Name', async () => {
-      for (const userWholeDatum of userWholeData) {
-        const route = replaceLast(paramsNames.username, testMetaData.username, routes.userCheckAuthWithUsername);
+      userWholeData.forEach((userWholeDatum) => {
+        const route = replaceLast(
+          paramsNames.username,
+          testMetaData.subscriberUsername,
+          routes.userCheckAuthWithUsername,
+        );
         const query = getQuery({
           password: testMetaData.passWord,
-          providerAddress: userWholeDatum.provider
+          providerAddress: userWholeDatum.provider,
         });
-        const result = await getResult(route, responseCodes.success, query);
-        isResExpected(result.body, true);
-      }
+        getResult(route, responseCodes.success, query)
+          .then((result) => {
+            isResExpected(result.body, true);
+          });
+      });
     });
   });
 
   describe('Check Subscription Functions', () => {
     getItWithTimeout('should Check Subscriptions With User Address', async () => {
-      for (const [index, userWholeDatum] of userWholeData.entries()) {
+      userWholeData.forEach((userWholeDatum, index) => {
         const query = getQuery({
-          userAddress: testMetaData.userAddress,
+          userAddress: testMetaData.subscriberAddress,
           providerAddress: userWholeDatum.provider,
           planIndex: index,
         });
-        const result = await getResult(routes.checkSubscription, responseCodes.success, query);
-        isResExpected(result.body || true, true);
-      }
+        getResult(routes.checkSubscription, responseCodes.success, query)
+          .then((result) => {
+            isResExpected(result.body || true, true);
+          });
+      });
     });
 
     getItWithTimeout('should Check Subscriptions With User Name', async () => {
-      for (const [index, userWholeDatum] of userWholeData.entries()) {
-        const route = replaceLast(paramsNames.username, testMetaData.username, routes.checkSubscriptionWithUsername);
+      userWholeData.forEach((userWholeDatum, index) => {
+        const route = replaceLast(
+          paramsNames.username,
+          testMetaData.subscriberUsername,
+          routes.checkSubscriptionWithUsername,
+        );
         const query = getQuery({
           providerAddress: userWholeDatum.provider,
-          planIndex: index
+          planIndex: index,
         });
-        const result = await getResult(route, responseCodes.success, query);
-        isResExpected(result.body || true, true);
-      }
+        getResult(route, responseCodes.success, query)
+          .then((result) => {
+            isResExpected(result.body || true, true);
+          });
+      });
     });
   });
 });

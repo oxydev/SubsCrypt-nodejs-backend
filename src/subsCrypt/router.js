@@ -15,6 +15,8 @@ const routes = {
   isUsernameAvailable: '/isUsernameAvailable/:username',
   userCheckAuthWithUsername: '/userCheckAuth/:username',
   providerCheckAuthWithUsername: '/providerCheckAuth/:username',
+  getWithdrawableAmount: '/providerWithdrawableAmount/:providerAddress',
+  getMoneyAddress: '/getMoneyAddress/:providerAddress',
   checkAuth: '/checkAuth',
   getSha2: '/getSha2',
   checkAuthWithUsername: '/checkAuth/:username',
