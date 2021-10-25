@@ -1,85 +1,107 @@
-const { DataTypes, Sequelize } = require('sequelize');
+const {
+  DataTypes,
+  Sequelize,
+} = require('sequelize');
 
-const DBSOURCE = '/usr/src/app/db.sqlite';
+let sequelize;
+let User;
+let Provider;
+let Subscription;
+let Plan;
 
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: DBSOURCE,
-  logging: false,
-});
+function getUserObject() {
+  return User;
+}
 
-const User = sequelize.define('User', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
-  user_address: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
-  },
-}, {
-  timestamps: false,
-});
+function getProviderObject() {
+  return Provider;
+}
 
-const Provider = sequelize.define('Provider', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
-  provider_address: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
-  },
-  profile_pic_id: {
-    type: DataTypes.STRING,
-    unique: true,
-  },
-  providerName: DataTypes.STRING,
-  description: DataTypes.STRING,
-  total_income: DataTypes.INTEGER,
-}, {
-  timestamps: false,
-});
+function getSubscriptionObject() {
+  return Subscription;
+}
 
-const Subscription = sequelize.define('Subscription', {
-  start_time: DataTypes.INTEGER,
-  duration: DataTypes.INTEGER,
-  price: DataTypes.INTEGER,
-  characteristics: {
-    type: Sequelize.STRING,
-    allowNull: false,
-    get() {
-      return this.getDataValue('characteristics')
-        .split(';');
+function getPlanObject() {
+  return Plan;
+}
+
+async function initDb(DBSOURCE) {
+  sequelize = new Sequelize({
+    dialect: 'sqlite',
+    storage: DBSOURCE,
+    logging: false,
+  });
+
+  User = sequelize.define('User', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
-    set(val) {
-      this.setDataValue('characteristics', val.join(';'));
+    user_address: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
     },
-  },
-}, {
-  timestamps: false,
-});
+  }, {
+    timestamps: false,
+  });
 
-const Plan = sequelize.define('Plan', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
+  Provider = sequelize.define('Provider', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    provider_address: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    profile_pic_id: {
+      type: DataTypes.STRING,
+      unique: true,
+    },
+    providerName: DataTypes.STRING,
+    description: DataTypes.STRING,
+    total_income: DataTypes.INTEGER,
+  }, {
+    timestamps: false,
+  });
+  Subscription = sequelize.define('Subscription', {
+    start_time: DataTypes.INTEGER,
+    duration: DataTypes.INTEGER,
+    price: DataTypes.INTEGER,
+    characteristics: {
+      type: Sequelize.STRING,
+      allowNull: false,
+      get() {
+        return this.getDataValue('characteristics')
+          .split(';');
+      },
+      set(val) {
+        this.setDataValue('characteristics', val.join(';'));
+      },
+    },
+  }, {
+    timestamps: false,
+  });
 
-  description: DataTypes.STRING,
-  planName: DataTypes.STRING,
-  plan_index: DataTypes.INTEGER,
+  Plan = sequelize.define('Plan', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
 
-}, {
-  timestamps: false,
-});
+    description: DataTypes.STRING,
+    planName: DataTypes.STRING,
+    plan_index: DataTypes.INTEGER,
 
-async function initDb() {
+  }, {
+    timestamps: false,
+  });
+
   Plan.belongsTo(Provider);
   Provider.hasMany(Plan);
 
@@ -91,8 +113,6 @@ async function initDb() {
 
   await sequelize.sync();
 }
-
-initDb();
 
 async function addUser(userAddress) {
   await User.findOrCreate({
@@ -337,6 +357,25 @@ async function getProductDescription(providerAddress, planIndex) {
   return [plan.description, plan.planName];
 }
 
+async function truncate() {
+  await User.destroy({
+    where: {},
+    force: true,
+  });
+  await Provider.destroy({
+    where: {},
+    force: true,
+  });
+  await Plan.destroy({
+    where: {},
+    force: true,
+  });
+  await Subscription.destroy({
+    where: {},
+    force: true,
+  });
+}
+
 module.exports = {
   getProviderProfile,
   updateProductDescription,
@@ -353,4 +392,11 @@ module.exports = {
   addSubscription,
   getUsers,
   getUsersOfPlan,
+  findProvider,
+  getUserObject,
+  getProviderObject,
+  getSubscriptionObject,
+  getPlanObject,
+  initDb,
+  truncate,
 };

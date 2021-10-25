@@ -1,4 +1,5 @@
 const db = require('../databaseWrapper/database');
+db.initDb('/usr/src/app/db.sqlite');
 
 async function getProviderData(req, res) {
   try {

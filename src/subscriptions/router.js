@@ -10,7 +10,7 @@ const routes = {
   getProviderData: '/getProviderData/:providerAddress',
   getProviderCustomIncome: '/getProviderCustomIncome/:providerAddress/:start/:finish',
   getPlanIncome: '/getPlanIncome/:providerAddress/:planIndex',
-  getPlanCustomIncome: '/getPlanIncomeCustomIncome/:providerAddress/:PlanIndex/:start/:finish',
+  getPlanCustomIncome: '/getPlanIncomeCustomIncome/:providerAddress/:planIndex/:start/:finish',
 };
 const MAIN_ROUTE = '/subscriptions';
 Object.keys(routes)
