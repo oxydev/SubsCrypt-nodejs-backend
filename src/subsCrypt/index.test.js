@@ -38,11 +38,11 @@ describe('Errors - IT', () => {
 
 const { routes } = require('./router');
 
-testMetaData.providerAddress = '5H7JNcUsERvHheAdHGnhBB2yZAUY5vT6fReNUVHhHt4n5M7B';
-testMetaData.subscriberAddress = '5C8bhNB4d5Umt95jJSEe6JYd9ZVFWL16uYyGk86zE7px47m6';
-testMetaData.providerName = 'hsgim';
-testMetaData.subscriberUsername = 'wzqc6';
-testMetaData.passWord = 'atvp8';
+testMetaData.providerAddress = '5E1CtWAkJAJ2HhNMeSwA4bYkWNWzYKSzvcTHNXP4WPZ75NZk';
+testMetaData.subscriberAddress = '5DnTpgDUtZ5jiRi2iN1LXWUWDm7FjKnU6Px5EiWV24n5mE77';
+testMetaData.providerName = 'uj37o';
+testMetaData.subscriberUsername = 'r4yrl';
+testMetaData.passWord = 'weten';
 testMetaData.plansCharacteristic = [['plan0']];
 testMetaData.plansData = [{
   duration: '86,400',
